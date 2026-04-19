@@ -1,0 +1,604 @@
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+function StatChip({ label, value }) {
+  return (
+    <div
+      style={{
+        padding: "6px 10px",
+        borderRadius: 999,
+        background: "#ffffff",
+        border: "1px solid #dbe2ea",
+        fontWeight: 800,
+        fontSize: 13
+      }}
+    >
+      {label}：{value}
+    </div>
+  );
+}
+
+function getDiffLabel(score, par) {
+  const s = Number(score);
+  const p = Number(par);
+  const diff = s - p;
+
+  if (p === 3 && s === 1) return "HOLE IN ONE";
+  if (p === 5 && s === 2) return "ALBATROSS";
+  if (diff === -2) return "EAGLE";
+  if (diff === -1) return "BIRDIE";
+  if (diff === 0) return "PAR";
+  if (diff === 1) return "BOGEY";
+  if (diff === 2) return "DOUBLE";
+  if (diff > 0) return `+${diff}`;
+  return `${diff}`;
+}
+
+function getDiffColor(score, par) {
+  const diff = score - par;
+  if (diff <= -1) return "#16a34a";
+  if (diff === 0) return "#2563eb";
+  return "#dc2626";
+}
+
+function isGir(score, putt, par) {
+  if (!score || !par) return false;
+  return score - putt <= par - 2;
+}
+
+export default function Result() {
+  const nav = useNavigate();
+  const [openPlayers, setOpenPlayers] = useState({});
+
+  const rounds = JSON.parse(localStorage.getItem("rounds") || "[]");
+  const pars = JSON.parse(localStorage.getItem("pars") || "[]");
+  const players = JSON.parse(localStorage.getItem("players") || "[]");
+  const events = JSON.parse(localStorage.getItem("events") || "[]");
+
+  const golfName =
+    localStorage.getItem("golfName") ||
+    localStorage.getItem("golfCourse") ||
+    "未設定";
+  const courseName = localStorage.getItem("courseName") || "";
+  const playDate = localStorage.getItem("playDate") || "";
+
+  const calcOlympicPoint = (playerRow) => {
+    let p = 0;
+    events.forEach((e) => {
+      if (e.active && playerRow?.eventChecks?.[e.key]) {
+        p += Number(e.point) || 0;
+      }
+    });
+    return p;
+  };
+
+  const getRoleText = (playerRow) => {
+    const labels = [];
+    events.forEach((e) => {
+      if (e.active && playerRow?.eventChecks?.[e.key]) {
+        labels.push(e.label);
+      }
+    });
+    return labels.length > 0 ? labels.join(" / ") : "-";
+  };
+
+  const playerSummaries = useMemo(() => {
+    return players.map((playerName, playerIndex) => {
+      const playerRounds = rounds.map((round, idx) => {
+        const row = round.players?.[playerIndex] || {};
+        const par = Number(pars[idx]) || 4;
+        const score = Number(row.score) || 0;
+        const putt = Number(row.putt) || 0;
+        const driveDistance = Number(row.driveDistance) || 0;
+        const fairwayKeep = row.fairwayKeep || "";
+
+        return {
+          hole: round.hole,
+          par,
+          score,
+          inside100: Number(row.inside100) || 0,
+          greenOnDistance: Number(row.greenOnDistance) || 0,
+          driveDistance,
+          fairwayKeep,
+          club: row.club || "-",
+          putt,
+          roleText: getRoleText(row),
+          olympicPoint: calcOlympicPoint(row),
+          diffLabel: getDiffLabel(score, par),
+          diffColor: getDiffColor(score, par),
+          gir: isGir(score, putt, par)
+        };
+      });
+
+      const totalScore = playerRounds.reduce((sum, r) => sum + r.score, 0);
+      const totalPar = playerRounds.reduce((sum, r) => sum + r.par, 0);
+      const totalOlympic = playerRounds.reduce((sum, r) => sum + r.olympicPoint, 0);
+      const avg =
+        playerRounds.length > 0
+          ? (totalScore / playerRounds.length).toFixed(1)
+          : "0.0";
+      const diff = totalScore - totalPar;
+
+      const validDriverDistances = playerRounds
+        .filter((r) => r.club === "Driver" && r.driveDistance > 0)
+        .map((r) => r.driveDistance);
+
+      const avgDriverDistance =
+        validDriverDistances.length > 0
+          ? (
+              validDriverDistances.reduce((sum, d) => sum + d, 0) /
+              validDriverDistances.length
+            ).toFixed(1)
+          : "-";
+
+      const fwTargets = playerRounds.filter(
+        (r) => r.par !== 3 && r.club === "Driver"
+      );
+      const fwKeeps = fwTargets.filter((r) => r.fairwayKeep === "keep").length;
+      const fwRate =
+        fwTargets.length > 0
+          ? `${Math.round((fwKeeps / fwTargets.length) * 100)}%`
+          : "-";
+
+      const oneOnTargets = playerRounds.filter((r) => r.par === 3);
+      const oneOnCount = oneOnTargets.filter(
+        (r) => r.fairwayKeep === "keep"
+      ).length;
+      const oneOnRate =
+        oneOnTargets.length > 0
+          ? `${Math.round((oneOnCount / oneOnTargets.length) * 100)}%`
+          : "-";
+
+      const girCount = playerRounds.filter((r) => r.gir).length;
+      const girRate =
+        playerRounds.length > 0
+          ? `${Math.round((girCount / playerRounds.length) * 100)}%`
+          : "-";
+
+      return {
+        playerName,
+        rounds: playerRounds,
+        totalScore,
+        totalPar,
+        totalOlympic,
+        avg,
+        diff,
+        avgDriverDistance,
+        fwRate,
+        oneOnRate,
+        girRate
+      };
+    });
+  }, [players, rounds, pars, events]);
+
+  const ranking = [...playerSummaries].sort((a, b) => a.totalScore - b.totalScore);
+
+  const toggleOpen = (name) => {
+    setOpenPlayers((prev) => ({
+      ...prev,
+      [name]: !prev[name]
+    }));
+  };
+
+  const handleSave = () => {
+    const saved = JSON.parse(localStorage.getItem("history") || "[]");
+
+    const newData = {
+      id: Date.now(),
+      date: new Date().toLocaleString(),
+      golfName,
+      courseName,
+      playDate,
+      players,
+      rounds,
+      pars,
+      events,
+      ranking: playerSummaries
+    };
+
+    const updated = [newData, ...saved];
+    localStorage.setItem("history", JSON.stringify(updated));
+
+    nav("/history");
+  };
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%)",
+        padding: 20,
+        boxSizing: "border-box"
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 1220,
+          margin: "0 auto",
+          background: "#ffffff",
+          borderRadius: 28,
+          padding: 20,
+          boxShadow: "0 18px 40px rgba(15,23,42,0.10)"
+        }}
+      >
+        <div
+          style={{
+            background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
+            color: "#ffffff",
+            borderRadius: 24,
+            padding: 20,
+            marginBottom: 18,
+            textAlign: "center"
+          }}
+        >
+          <div style={{ fontSize: 13, opacity: 0.9 }}>ROUND RESULT</div>
+          <h1 style={{ margin: "6px 0 0 0", fontSize: 34 }}>結果</h1>
+          <div style={{ marginTop: 10, fontSize: 20, fontWeight: 800 }}>
+            {golfName}
+          </div>
+          {courseName ? (
+            <div style={{ marginTop: 4, fontSize: 15 }}>{courseName}</div>
+          ) : null}
+          {playDate ? (
+            <div style={{ marginTop: 4, fontSize: 13 }}>{playDate}</div>
+          ) : null}
+        </div>
+
+        <div
+          style={{
+            background: "#f8fafc",
+            border: "1px solid #e2e8f0",
+            borderRadius: 20,
+            padding: 14,
+            marginBottom: 18
+          }}
+        >
+          <h2 style={{ marginTop: 0, marginBottom: 12, fontSize: 22 }}>
+            全員スコア一覧
+          </h2>
+
+          <div style={{ display: "grid", gap: 12 }}>
+            {ranking.map((player, idx) => (
+              <div
+                key={player.playerName}
+                style={{
+                  background: "#ffffff",
+                  border: idx === 0 ? "2px solid #f59e0b" : "1px solid #dbe2ea",
+                  borderRadius: 18,
+                  padding: 14,
+                  boxShadow:
+                    idx === 0
+                      ? "0 8px 20px rgba(245,158,11,0.18)"
+                      : "0 4px 12px rgba(15,23,42,0.06)"
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: 12,
+                    flexWrap: "wrap"
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                      flexWrap: "wrap"
+                    }}
+                  >
+                    <div
+                      style={{
+                        minWidth: 52,
+                        height: 52,
+                        borderRadius: 999,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: idx === 0 ? "#fef3c7" : "#eff6ff",
+                        color: idx === 0 ? "#b45309" : "#1d4ed8",
+                        fontWeight: 900,
+                        fontSize: 20
+                      }}
+                    >
+                      {idx + 1}
+                    </div>
+
+                    <div>
+                      <div
+                        style={{
+                          fontSize: 20,
+                          fontWeight: 900,
+                          color: "#0f172a"
+                        }}
+                      >
+                        {player.playerName}
+                      </div>
+                      <div
+                        style={{
+                          marginTop: 4,
+                          fontSize: 13,
+                          color: "#64748b"
+                        }}
+                      >
+                        平均 {player.avg} / OP {player.totalOlympic}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 8,
+                      flexWrap: "wrap",
+                      alignItems: "center"
+                    }}
+                  >
+                    <div
+                      style={{
+                        padding: "8px 14px",
+                        borderRadius: 999,
+                        background: "#f8fafc",
+                        border: "1px solid #dbe2ea",
+                        fontWeight: 900,
+                        fontSize: 20,
+                        color: "#0f172a"
+                      }}
+                    >
+                      {player.totalScore}打
+                    </div>
+
+                    <div
+                      style={{
+                        padding: "8px 14px",
+                        borderRadius: 999,
+                        background: player.diff <= 0 ? "#f0fdf4" : "#fef2f2",
+                        border: `1px solid ${
+                          player.diff <= 0 ? "#bbf7d0" : "#fecaca"
+                        }`,
+                        fontWeight: 900,
+                        color: player.diff <= 0 ? "#15803d" : "#dc2626"
+                      }}
+                    >
+                      {player.diff > 0 ? `+${player.diff}` : player.diff}
+                    </div>
+
+                    <StatChip
+                      label="平均Driver"
+                      value={
+                        player.avgDriverDistance === "-"
+                          ? "-"
+                          : `${player.avgDriverDistance}Y`
+                      }
+                    />
+                    <StatChip label="FW率" value={player.fwRate} />
+                    <StatChip label="ワンオン率" value={player.oneOnRate} />
+                    <StatChip label="GIR率" value={player.girRate} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gap: 12 }}>
+          {playerSummaries.map((summary) => (
+            <div
+              key={summary.playerName}
+              style={{
+                background: "#f8fafc",
+                border: "1px solid #e2e8f0",
+                borderRadius: 20,
+                overflow: "hidden"
+              }}
+            >
+              <button
+                onClick={() => toggleOpen(summary.playerName)}
+                style={{
+                  width: "100%",
+                  border: "none",
+                  background: "transparent",
+                  padding: 16,
+                  cursor: "pointer",
+                  textAlign: "left"
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: 12,
+                    flexWrap: "wrap"
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                    <div style={{ fontSize: 22, fontWeight: 900 }}>
+                      {summary.playerName}
+                    </div>
+                    <div
+                      style={{
+                        padding: "6px 12px",
+                        borderRadius: 999,
+                        background: "#ffffff",
+                        border: "1px solid #dbe2ea",
+                        fontWeight: 900,
+                        color: summary.diff <= 0 ? "#16a34a" : "#dc2626"
+                      }}
+                    >
+                      {summary.totalScore}打 / {summary.diff > 0 ? `+${summary.diff}` : summary.diff}
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    <StatChip
+                      label="平均Driver"
+                      value={
+                        summary.avgDriverDistance === "-"
+                          ? "-"
+                          : `${summary.avgDriverDistance}Y`
+                      }
+                    />
+                    <StatChip label="FW率" value={summary.fwRate} />
+                    <StatChip label="ワンオン率" value={summary.oneOnRate} />
+                    <StatChip label="GIR率" value={summary.girRate} />
+                    <StatChip
+                      label=""
+                      value={openPlayers[summary.playerName] ? "▲ 閉じる" : "▼ 詳細"}
+                    />
+                  </div>
+                </div>
+              </button>
+
+              {openPlayers[summary.playerName] && (
+                <div style={{ padding: "0 16px 16px 16px" }}>
+                  <div style={{ overflowX: "auto" }}>
+                    <table
+                      style={{
+                        width: "100%",
+                        borderCollapse: "collapse",
+                        minWidth: 1320,
+                        background: "#ffffff",
+                        borderRadius: 16,
+                        overflow: "hidden"
+                      }}
+                    >
+                      <thead>
+                        <tr style={{ background: "#f8fafc" }}>
+                          <th style={thStyle}>H</th>
+                          <th style={thStyle}>打数</th>
+                          <th style={thStyle}>比較</th>
+                          <th style={thStyle}>100Y以内</th>
+                          <th style={thStyle}>ON距離</th>
+                          <th style={thStyle}>1打目飛距離</th>
+                          <th style={thStyle}>FW / ワンオン</th>
+                          <th style={thStyle}>GIR</th>
+                          <th style={thStyle}>クラブ</th>
+                          <th style={thStyle}>パット</th>
+                          <th style={thStyle}>役</th>
+                          <th style={thStyle}>OP</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {summary.rounds.map((r, i) => (
+                          <tr key={i}>
+                            <td style={tdStyle}>H{r.hole}</td>
+                            <td
+                              style={{
+                                ...tdStyle,
+                                fontWeight: 900,
+                                color: r.diffColor,
+                                fontSize: 15
+                              }}
+                            >
+                              {r.score}
+                            </td>
+                            <td
+                              style={{
+                                ...tdStyle,
+                                fontWeight: 800,
+                                color: r.diffColor
+                              }}
+                            >
+                              {r.diffLabel}
+                            </td>
+                            <td style={tdStyle}>{r.inside100}</td>
+                            <td style={tdStyle}>{r.greenOnDistance || "-"}</td>
+                            <td style={tdStyle}>{r.driveDistance || "-"}</td>
+                            <td style={tdStyle}>
+                              {r.par === 3
+                                ? r.fairwayKeep === "keep"
+                                  ? "ワンオン○"
+                                  : "-"
+                                : r.club === "Driver"
+                                  ? r.fairwayKeep === "keep"
+                                    ? "FW○"
+                                    : "-"
+                                  : "-"}
+                            </td>
+                            <td
+                              style={{
+                                ...tdStyle,
+                                color: r.gir ? "#16a34a" : "#64748b",
+                                fontWeight: 800
+                              }}
+                            >
+                              {r.gir ? "○" : "-"}
+                            </td>
+                            <td style={tdStyle}>{r.club}</td>
+                            <td style={tdStyle}>{r.putt}</td>
+                            <td style={{ ...tdStyle, textAlign: "left" }}>{r.roleText}</td>
+                            <td style={tdStyle}>{r.olympicPoint}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: 12,
+            marginTop: 22,
+            flexWrap: "wrap"
+          }}
+        >
+          <button
+            onClick={handleSave}
+            style={{
+              padding: "12px 20px",
+              borderRadius: 12,
+              border: "none",
+              background: "#16a34a",
+              color: "#fff",
+              fontWeight: "bold",
+              cursor: "pointer"
+            }}
+          >
+            保存する
+          </button>
+
+          <button
+            onClick={() => nav("/")}
+            style={{
+              padding: "12px 20px",
+              borderRadius: 12,
+              border: "1px solid #cbd5e1",
+              background: "#fff",
+              color: "#0f172a",
+              fontWeight: "bold",
+              cursor: "pointer"
+            }}
+          >
+            トップに戻る
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const thStyle = {
+  padding: "10px 8px",
+  border: "1px solid #dbe2ea",
+  fontSize: 13,
+  fontWeight: 800,
+  textAlign: "center",
+  whiteSpace: "nowrap"
+};
+
+const tdStyle = {
+  padding: "10px 8px",
+  border: "1px solid #e5e7eb",
+  fontSize: 13,
+  textAlign: "center",
+  whiteSpace: "nowrap"
+};
