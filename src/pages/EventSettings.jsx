@@ -23,6 +23,7 @@ export default function EventSettings() {
       setEvents(saved);
     } else {
       setEvents(defaultEvents);
+      localStorage.setItem("events", JSON.stringify(defaultEvents));
     }
   }, []);
 
@@ -30,6 +31,14 @@ export default function EventSettings() {
     setEvents((prev) => {
       const next = [...prev];
       next[index] = { ...next[index], active: !next[index].active };
+      return next;
+    });
+  };
+
+  const updateLabel = (index, value) => {
+    setEvents((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], label: value };
       return next;
     });
   };
@@ -45,10 +54,21 @@ export default function EventSettings() {
     });
   };
 
+  const toggleSingle = (index) => {
+    setEvents((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], single: !next[index].single };
+      return next;
+    });
+  };
+
   const saveEvents = () => {
-    const cleaned = events.map((e) => ({
-      ...e,
-      point: Number(e.point) || 0
+    const cleaned = events.map((e, index) => ({
+      key: e.key || `custom_${index}`,
+      label: e.label || `役${index + 1}`,
+      point: Number(e.point) || 0,
+      active: !!e.active,
+      single: !!e.single
     }));
     localStorage.setItem("events", JSON.stringify(cleaned));
     navigate("/");
@@ -56,6 +76,24 @@ export default function EventSettings() {
 
   const resetEvents = () => {
     setEvents(defaultEvents);
+    localStorage.setItem("events", JSON.stringify(defaultEvents));
+  };
+
+  const addEvent = () => {
+    setEvents((prev) => [
+      ...prev,
+      {
+        key: `custom_${Date.now()}`,
+        label: "新しい役",
+        point: 0,
+        active: true,
+        single: false
+      }
+    ]);
+  };
+
+  const deleteEvent = (index) => {
+    setEvents((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -89,7 +127,7 @@ export default function EventSettings() {
           <div style={{ fontSize: 14, opacity: 0.9 }}>EVENT SETTINGS</div>
           <h1 style={{ margin: "6px 0 0 0", fontSize: 30 }}>役をカスタム</h1>
           <div style={{ marginTop: 8, fontSize: 15 }}>
-            表示されない役はここでONにしてください
+            役名・点数・ON/OFF をここで変更できます
           </div>
         </div>
 
@@ -104,62 +142,86 @@ export default function EventSettings() {
                 background: "#f8fafc"
               }}
             >
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr",
-                  gap: 10
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 18,
-                    fontWeight: 900,
-                    color: "#0f172a",
-                    whiteSpace: "normal",
-                    overflowWrap: "break-word"
-                  }}
-                >
-                  {event.label}
+              <div style={{ display: "grid", gap: 10 }}>
+                <div>
+                  <div style={{ fontSize: 13, color: "#64748b", marginBottom: 6 }}>
+                    役名
+                  </div>
+                  <input
+                    type="text"
+                    value={event.label}
+                    onChange={(e) => updateLabel(index, e.target.value)}
+                    style={inputStyle}
+                  />
                 </div>
 
                 <div
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "1fr 120px",
-                    gap: 10,
-                    alignItems: "center"
+                    gridTemplateColumns: "1fr 110px",
+                    gap: 10
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: 13, color: "#64748b", marginBottom: 6 }}>
+                      点数
+                    </div>
+                    <input
+                      type="number"
+                      value={event.point}
+                      onChange={(e) => updatePoint(index, e.target.value)}
+                      style={inputStyle}
+                    />
+                  </div>
+
+                  <div>
+                    <div style={{ fontSize: 13, color: "#64748b", marginBottom: 6 }}>
+                      ON / OFF
+                    </div>
+                    <button
+                      onClick={() => toggleActive(index)}
+                      style={{
+                        ...buttonStyle,
+                        background: event.active ? "#16a34a" : "#94a3b8",
+                        color: "#ffffff",
+                        border: "none"
+                      }}
+                    >
+                      {event.active ? "ON" : "OFF"}
+                    </button>
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: 10
                   }}
                 >
                   <button
-                    onClick={() => toggleActive(index)}
+                    onClick={() => toggleSingle(index)}
                     style={{
-                      padding: "12px 14px",
-                      borderRadius: 12,
-                      border: "none",
-                      background: event.active ? "#16a34a" : "#94a3b8",
-                      color: "#ffffff",
-                      fontWeight: "bold",
-                      cursor: "pointer"
+                      ...buttonStyle,
+                      background: "#ffffff",
+                      color: "#0f172a",
+                      border: "1px solid #cbd5e1"
                     }}
                   >
-                    {event.active ? "ON" : "OFF"}
+                    {event.single ? "単独系" : "重複可"}
                   </button>
 
-                  <input
-                    type="number"
-                    value={event.point}
-                    onChange={(e) => updatePoint(index, e.target.value)}
+                  <button
+                    onClick={() => deleteEvent(index)}
                     style={{
-                      width: "100%",
-                      boxSizing: "border-box",
-                      padding: "12px 14px",
-                      borderRadius: 12,
-                      border: "1px solid #cbd5e1",
-                      fontSize: 16,
-                      background: "#ffffff"
+                      ...buttonStyle,
+                      background: "#fff5f5",
+                      color: "#b91c1c",
+                      border: "1px solid #ef4444"
                     }}
-                  />
+                  >
+                    この役を削除
+                  </button>
                 </div>
 
                 <div
@@ -171,8 +233,8 @@ export default function EventSettings() {
                   }}
                 >
                   {event.single
-                    ? "この役は単独系です（同時に1つだけ）"
-                    : "この役は他の役と同時に選べます"}
+                    ? "単独系：同時に1つだけ選ぶ役"
+                    : "重複可：他の役と同時に選べる役"}
                 </div>
               </div>
             </div>
@@ -188,16 +250,24 @@ export default function EventSettings() {
           }}
         >
           <button
+            onClick={addEvent}
+            style={{
+              ...buttonStyle,
+              background: "#ffffff",
+              color: "#2563eb",
+              border: "1px solid #93c5fd"
+            }}
+          >
+            役を追加
+          </button>
+
+          <button
             onClick={saveEvents}
             style={{
-              padding: "14px 16px",
-              borderRadius: 14,
-              border: "none",
+              ...buttonStyle,
               background: "#2563eb",
               color: "#ffffff",
-              fontWeight: "bold",
-              fontSize: 16,
-              cursor: "pointer"
+              border: "none"
             }}
           >
             保存して戻る
@@ -206,14 +276,10 @@ export default function EventSettings() {
           <button
             onClick={resetEvents}
             style={{
-              padding: "14px 16px",
-              borderRadius: 14,
-              border: "1px solid #cbd5e1",
+              ...buttonStyle,
               background: "#ffffff",
               color: "#0f172a",
-              fontWeight: "bold",
-              fontSize: 16,
-              cursor: "pointer"
+              border: "1px solid #cbd5e1"
             }}
           >
             初期値に戻す
@@ -222,14 +288,10 @@ export default function EventSettings() {
           <button
             onClick={() => navigate("/")}
             style={{
-              padding: "14px 16px",
-              borderRadius: 14,
-              border: "1px solid #cbd5e1",
+              ...buttonStyle,
               background: "#ffffff",
               color: "#0f172a",
-              fontWeight: "bold",
-              fontSize: 16,
-              cursor: "pointer"
+              border: "1px solid #cbd5e1"
             }}
           >
             トップへ戻る
@@ -239,3 +301,22 @@ export default function EventSettings() {
     </div>
   );
 }
+
+const inputStyle = {
+  width: "100%",
+  boxSizing: "border-box",
+  padding: "12px 14px",
+  borderRadius: 12,
+  border: "1px solid #cbd5e1",
+  fontSize: 16,
+  background: "#ffffff"
+};
+
+const buttonStyle = {
+  width: "100%",
+  padding: "12px 14px",
+  borderRadius: 12,
+  fontWeight: "bold",
+  fontSize: 15,
+  cursor: "pointer"
+};
