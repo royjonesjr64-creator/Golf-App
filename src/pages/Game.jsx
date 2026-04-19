@@ -224,7 +224,10 @@ export default function Game() {
     background: "#ffffff",
     border: `2px solid ${score === "" ? "#dbe2ea" : getDiffColor(score)}`,
     fontWeight: "bold",
-    color: getDiffColor(score)
+    color: getDiffColor(score),
+    width: "100%",
+    textAlign: "center",
+    boxSizing: "border-box"
   });
 
   const inputStyle = {
@@ -234,7 +237,8 @@ export default function Game() {
     borderRadius: 14,
     border: "1px solid #cbd5e1",
     fontSize: 16,
-    background: "#ffffff"
+    background: "#ffffff",
+    minWidth: 0
   };
 
   const getCenterScoreStyle = (score) => ({
@@ -255,14 +259,15 @@ export default function Game() {
   });
 
   const quickButtonStyle = (active) => ({
-    padding: "10px 0",
+    padding: "10px 8px",
     borderRadius: 12,
     border: active ? "2px solid #2563eb" : "1px solid #dbe2ea",
     background: active ? "#2563eb" : "#ffffff",
     color: active ? "#ffffff" : "#0f172a",
     fontWeight: "bold",
-    fontSize: 15,
-    cursor: "pointer"
+    fontSize: 14,
+    cursor: "pointer",
+    minHeight: 48
   });
 
   const eventButtonStyle = (active) => ({
@@ -276,7 +281,9 @@ export default function Game() {
     background: active ? "#eff6ff" : "#ffffff",
     fontWeight: 700,
     cursor: "pointer",
-    fontSize: 14
+    fontSize: 14,
+    width: "100%",
+    textAlign: "left"
   });
 
   const modalBackdropStyle = {
@@ -286,7 +293,7 @@ export default function Game() {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    padding: 20,
+    padding: 16,
     boxSizing: "border-box",
     zIndex: 1000
   };
@@ -321,7 +328,7 @@ export default function Game() {
       style={{
         minHeight: "100vh",
         background: "linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%)",
-        padding: 20,
+        padding: 12,
         boxSizing: "border-box"
       }}
     >
@@ -331,7 +338,7 @@ export default function Game() {
           margin: "0 auto",
           background: "#ffffff",
           borderRadius: 28,
-          padding: 24,
+          padding: 16,
           boxShadow: "0 18px 40px rgba(15,23,42,0.10)"
         }}
       >
@@ -340,12 +347,12 @@ export default function Game() {
             background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
             color: "#ffffff",
             borderRadius: 24,
-            padding: 24,
-            marginBottom: 20
+            padding: 20,
+            marginBottom: 16
           }}
         >
           <div style={{ fontSize: 14, opacity: 0.9 }}>ROUND INPUT</div>
-          <h1 style={{ margin: "6px 0 0 0", fontSize: 36 }}>ゲーム画面</h1>
+          <h1 style={{ margin: "6px 0 0 0", fontSize: 32 }}>ゲーム画面</h1>
           <div style={{ marginTop: 8, fontSize: 20, fontWeight: 700 }}>
             ホール {hole} / {holeCount}
           </div>
@@ -368,7 +375,7 @@ export default function Game() {
             プレイヤー情報がありません。最初から設定してください。
           </div>
         ) : (
-          <div style={{ display: "grid", gap: 18 }}>
+          <div style={{ display: "grid", gap: 16 }}>
             {playerNames.map((player, playerIndex) => {
               const row = rows[playerIndex] || emptyRow;
               const labels = selectedEventLabels(playerIndex);
@@ -380,20 +387,18 @@ export default function Game() {
                     background: "#f8fafc",
                     border: "1px solid #e2e8f0",
                     borderRadius: 22,
-                    padding: 18
+                    padding: 14
                   }}
                 >
                   <div
                     style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      gap: 12,
-                      flexWrap: "wrap",
+                      display: "grid",
+                      gridTemplateColumns: "1fr",
+                      gap: 10,
                       marginBottom: 14
                     }}
                   >
-                    <h2 style={{ margin: 0, fontSize: 24 }}>{player}</h2>
+                    <h2 style={{ margin: 0, fontSize: 22 }}>{player}</h2>
                     <div style={getScoreBadgeStyle(row.score)}>
                       {row.score === ""
                         ? "未入力"
@@ -404,7 +409,7 @@ export default function Game() {
                   <div
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "repeat(5, 1fr)",
+                      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
                       gap: 10,
                       marginBottom: 12
                     }}
@@ -415,8 +420,6 @@ export default function Game() {
                         ...quickButtonStyle(
                           Number(row.score) === currentPar - 2
                         ),
-                        width: "100%",
-                        fontSize: "12px",
                         whiteSpace: "nowrap"
                       }}
                     >
@@ -450,9 +453,12 @@ export default function Game() {
 
                     <button
                       onClick={() => setScoreFromPar(playerIndex, 2)}
-                      style={quickButtonStyle(
-                        Number(row.score) === currentPar + 2
-                      )}
+                      style={{
+                        ...quickButtonStyle(
+                          Number(row.score) === currentPar + 2
+                        ),
+                        gridColumn: "1 / -1"
+                      }}
                     >
                       Double
                     </button>
@@ -461,8 +467,8 @@ export default function Game() {
                   <div
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "80px 1fr 80px",
-                      gap: 10,
+                      gridTemplateColumns: "64px 1fr 64px",
+                      gap: 8,
                       alignItems: "center",
                       marginBottom: 14
                     }}
@@ -494,8 +500,8 @@ export default function Game() {
                   <div
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "1.3fr 1fr 1fr 1fr 1fr 1fr",
-                      gap: 12
+                      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                      gap: 10
                     }}
                   >
                     <button
@@ -614,16 +620,15 @@ export default function Game() {
 
         <div
           style={{
-            display: "flex",
-            gap: 12,
-            justifyContent: "space-between",
-            marginTop: 22
+            display: "grid",
+            gridTemplateColumns: "1fr",
+            gap: 10,
+            marginTop: 18
           }}
         >
           <button
             onClick={prevHole}
             style={{
-              flex: 1,
               padding: "16px 20px",
               borderRadius: 16,
               border: "1px solid #cbd5e1",
@@ -640,7 +645,6 @@ export default function Game() {
           <button
             onClick={nextHole}
             style={{
-              flex: 2,
               padding: "16px 20px",
               borderRadius: 16,
               border: "none",
@@ -667,10 +671,13 @@ export default function Game() {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                gap: 10,
                 marginBottom: 14
               }}
             >
-              <h2 style={{ margin: 0 }}>100Y以内 / グリーンON距離</h2>
+              <h2 style={{ margin: 0, fontSize: 20 }}>
+                100Y以内 / グリーンON距離
+              </h2>
               <button
                 onClick={() => setInside100ModalPlayer(null)}
                 style={closeButtonStyle}
@@ -742,11 +749,17 @@ export default function Game() {
               style={inputStyle}
             />
 
-            <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr",
+                gap: 10,
+                marginTop: 14
+              }}
+            >
               <button
                 onClick={() => setInside100ModalPlayer(null)}
                 style={{
-                  flex: 1,
                   padding: "14px 16px",
                   borderRadius: 14,
                   border: "1px solid #cbd5e1",
@@ -765,7 +778,6 @@ export default function Game() {
                   setInside100ModalPlayer(null);
                 }}
                 style={{
-                  flex: 1,
                   padding: "14px 16px",
                   borderRadius: 14,
                   border: "1px solid #ef4444",
@@ -793,10 +805,11 @@ export default function Game() {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                gap: 10,
                 marginBottom: 14
               }}
             >
-              <h2 style={{ margin: 0 }}>1打目飛距離</h2>
+              <h2 style={{ margin: 0, fontSize: 20 }}>1打目飛距離</h2>
               <button
                 onClick={() => setDriveModalPlayer(null)}
                 style={closeButtonStyle}
@@ -814,11 +827,17 @@ export default function Game() {
               style={inputStyle}
             />
 
-            <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr",
+                gap: 10,
+                marginTop: 14
+              }}
+            >
               <button
                 onClick={() => setDriveModalPlayer(null)}
                 style={{
-                  flex: 1,
                   padding: "14px 16px",
                   borderRadius: 14,
                   border: "1px solid #cbd5e1",
@@ -836,7 +855,6 @@ export default function Game() {
                   setDriveModalPlayer(null);
                 }}
                 style={{
-                  flex: 1,
                   padding: "14px 16px",
                   borderRadius: 14,
                   border: "1px solid #ef4444",
@@ -864,10 +882,11 @@ export default function Game() {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                gap: 10,
                 marginBottom: 14
               }}
             >
-              <h2 style={{ margin: 0 }}>パット</h2>
+              <h2 style={{ margin: 0, fontSize: 20 }}>パット</h2>
               <button
                 onClick={() => setPuttModalPlayer(null)}
                 style={closeButtonStyle}
@@ -913,11 +932,17 @@ export default function Game() {
               style={inputStyle}
             />
 
-            <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr",
+                gap: 10,
+                marginTop: 14
+              }}
+            >
               <button
                 onClick={() => setPuttModalPlayer(null)}
                 style={{
-                  flex: 1,
                   padding: "14px 16px",
                   borderRadius: 14,
                   border: "1px solid #cbd5e1",
@@ -935,7 +960,6 @@ export default function Game() {
                   setPuttModalPlayer(null);
                 }}
                 style={{
-                  flex: 1,
                   padding: "14px 16px",
                   borderRadius: 14,
                   border: "1px solid #ef4444",
@@ -963,10 +987,11 @@ export default function Game() {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                gap: 10,
                 marginBottom: 14
               }}
             >
-              <h2 style={{ margin: 0 }}>クラブ選択</h2>
+              <h2 style={{ margin: 0, fontSize: 20 }}>クラブ選択</h2>
               <button
                 onClick={() => setClubModalPlayer(null)}
                 style={closeButtonStyle}
@@ -1039,10 +1064,11 @@ export default function Game() {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                gap: 10,
                 marginBottom: 14
               }}
             >
-              <h2 style={{ margin: 0 }}>役を選択</h2>
+              <h2 style={{ margin: 0, fontSize: 20 }}>役を選択</h2>
               <button
                 onClick={() => setEventModalPlayer(null)}
                 style={closeButtonStyle}
@@ -1052,28 +1078,57 @@ export default function Game() {
             </div>
 
             <div style={{ display: "grid", gap: 10 }}>
-              {activeEvents.map((event) => (
-                <button
-                  key={event.key}
-                  type="button"
-                  onClick={() => toggleEvent(eventModalPlayer, event.key)}
-                  style={eventButtonStyle(
-                    !!rows[eventModalPlayer]?.eventChecks?.[event.key]
-                  )}
+              {activeEvents.length === 0 ? (
+                <div
+                  style={{
+                    padding: 14,
+                    borderRadius: 14,
+                    background: "#f8fafc",
+                    border: "1px solid #dbe2ea",
+                    color: "#64748b"
+                  }}
                 >
-                  <span>{event.label}</span>
-                  <span style={{ color: "#64748b" }}>
-                    {event.point > 0 ? `+${event.point}` : event.point}
-                  </span>
-                </button>
-              ))}
+                  有効な役がありません。役設定でONにしてください。
+                </div>
+              ) : (
+                activeEvents.map((event) => (
+                  <button
+                    key={event.key}
+                    type="button"
+                    onClick={() => toggleEvent(eventModalPlayer, event.key)}
+                    style={eventButtonStyle(
+                      !!rows[eventModalPlayer]?.eventChecks?.[event.key]
+                    )}
+                  >
+                    <span
+                      style={{
+                        flex: 1,
+                        minWidth: 0,
+                        whiteSpace: "normal",
+                        overflowWrap: "break-word"
+                      }}
+                    >
+                      {event.label}
+                    </span>
+                    <span style={{ color: "#64748b", flexShrink: 0 }}>
+                      {event.point > 0 ? `+${event.point}` : event.point}
+                    </span>
+                  </button>
+                ))
+              )}
             </div>
 
-            <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr",
+                gap: 10,
+                marginTop: 14
+              }}
+            >
               <button
                 onClick={() => setEventModalPlayer(null)}
                 style={{
-                  flex: 1,
                   padding: "14px 16px",
                   borderRadius: 14,
                   border: "1px solid #cbd5e1",
@@ -1088,7 +1143,6 @@ export default function Game() {
               <button
                 onClick={() => updateRow(eventModalPlayer, "eventChecks", {})}
                 style={{
-                  flex: 1,
                   padding: "14px 16px",
                   borderRadius: 14,
                   border: "1px solid #ef4444",

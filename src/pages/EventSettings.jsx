@@ -1,93 +1,61 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const defaultEvents = [
+  { key: "condor", label: "コンドル", point: 100, active: true, single: true },
+  { key: "holeInOne", label: "ホールインワン", point: 100, active: true, single: true },
+  { key: "albatross", label: "アルバトロス", point: 50, active: true, single: true },
+  { key: "eagle", label: "イーグル", point: 30, active: true, single: true },
+  { key: "birdie", label: "バーディ", point: 3, active: true, single: true },
+  { key: "diamond", label: "ダイヤモンド", point: 5, active: true, single: false },
+  { key: "suna0", label: "砂ゼロ", point: 8, active: true, single: false },
+  { key: "suna1", label: "砂一", point: 3, active: true, single: false },
+  { key: "sao", label: "竿", point: 3, active: true, single: false }
+];
+
 export default function EventSettings() {
-  const nav = useNavigate();
+  const navigate = useNavigate();
+  const [events, setEvents] = useState([]);
 
-  const fixedKeys = ["gold", "silver", "bronze", "iron"];
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem("events") || "null");
+    if (saved && Array.isArray(saved) && saved.length > 0) {
+      setEvents(saved);
+    } else {
+      setEvents(defaultEvents);
+    }
+  }, []);
 
-  const defaultEvents = [
-    { key: "gold", label: "金", point: 4, active: true, single: true },
-    { key: "silver", label: "銀", point: 3, active: true, single: true },
-    { key: "bronze", label: "銅", point: 2, active: true, single: true },
-    { key: "iron", label: "鉄", point: 1, active: true, single: true },
-    { key: "yarn", label: "竿", point: 3, active: true, single: false },
-    { key: "sand0", label: "砂ゼロ", point: 8, active: true, single: false },
-    { key: "sand1", label: "砂1", point: 3, active: true, single: false },
-    { key: "diamond", label: "ダイヤ", point: 5, active: true, single: false },
-    { key: "birdie", label: "バーディ", point: 3, active: true, single: false },
-    { key: "eagle", label: "イーグル", point: 30, active: true, single: false },
-    { key: "alba", label: "アルバトロス", point: 50, active: true, single: false },
-    { key: "holeInOne", label: "ホールインワン", point: 100, active: true, single: false }
-  ];
-
-  const saved = JSON.parse(localStorage.getItem("events") || "null");
-
-  const mergedEvents = saved
-    ? [
-        ...defaultEvents.filter((d) => !saved.some((s) => s.key === d.key)),
-        ...saved
-      ]
-    : defaultEvents;
-
-  const [events, setEvents] = useState(mergedEvents);
-
-  const fixedEvents = fixedKeys
-    .map((key) => events.find((e) => e.key === key))
-    .filter(Boolean);
-
-  const customEvents = events.filter((e) => !fixedKeys.includes(e.key));
-
-  const sortedEvents = [...fixedEvents, ...customEvents];
-
-  const updateByKey = (key, field, value) => {
-    const next = events.map((e) =>
-      e.key === key ? { ...e, [field]: value } : e
-    );
-    setEvents(next);
+  const toggleActive = (index) => {
+    setEvents((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], active: !next[index].active };
+      return next;
+    });
   };
 
-  const addEvent = () => {
-    setEvents([
-      ...events,
-      {
-        key: `custom_${Date.now()}`,
-        label: "新しい役",
-        point: 1,
-        active: true,
-        single: false
-      }
-    ]);
+  const updatePoint = (index, value) => {
+    setEvents((prev) => {
+      const next = [...prev];
+      next[index] = {
+        ...next[index],
+        point: value === "" ? "" : Number(value)
+      };
+      return next;
+    });
   };
 
-  const removeByKey = (key) => {
-    if (fixedKeys.includes(key)) return;
-    setEvents(events.filter((e) => e.key !== key));
+  const saveEvents = () => {
+    const cleaned = events.map((e) => ({
+      ...e,
+      point: Number(e.point) || 0
+    }));
+    localStorage.setItem("events", JSON.stringify(cleaned));
+    navigate("/");
   };
 
-  const moveCustomUp = (key) => {
-    const idx = customEvents.findIndex((e) => e.key === key);
-    if (idx <= 0) return;
-
-    const nextCustom = [...customEvents];
-    [nextCustom[idx - 1], nextCustom[idx]] = [nextCustom[idx], nextCustom[idx - 1]];
-
-    setEvents([...fixedEvents, ...nextCustom]);
-  };
-
-  const moveCustomDown = (key) => {
-    const idx = customEvents.findIndex((e) => e.key === key);
-    if (idx === -1 || idx >= customEvents.length - 1) return;
-
-    const nextCustom = [...customEvents];
-    [nextCustom[idx + 1], nextCustom[idx]] = [nextCustom[idx], nextCustom[idx + 1]];
-
-    setEvents([...fixedEvents, ...nextCustom]);
-  };
-
-  const save = () => {
-    localStorage.setItem("events", JSON.stringify(events));
-    nav("/");
+  const resetEvents = () => {
+    setEvents(defaultEvents);
   };
 
   return (
@@ -95,17 +63,17 @@ export default function EventSettings() {
       style={{
         minHeight: "100vh",
         background: "linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%)",
-        padding: 20,
+        padding: 12,
         boxSizing: "border-box"
       }}
     >
       <div
         style={{
-          maxWidth: 980,
+          maxWidth: 860,
           margin: "0 auto",
           background: "#ffffff",
           borderRadius: 28,
-          padding: 24,
+          padding: 16,
           boxShadow: "0 18px 40px rgba(15,23,42,0.10)"
         }}
       >
@@ -114,212 +82,160 @@ export default function EventSettings() {
             background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
             color: "#ffffff",
             borderRadius: 24,
-            padding: 24,
-            marginBottom: 22
+            padding: 20,
+            marginBottom: 16
           }}
         >
           <div style={{ fontSize: 14, opacity: 0.9 }}>EVENT SETTINGS</div>
-          <h1 style={{ margin: "6px 0 0 0", fontSize: 38 }}>役の設定</h1>
-          <div style={{ marginTop: 8, fontSize: 16, fontWeight: 700 }}>
-            金銀銅鉄も含めて役名・点数・ON/OFFを設定
+          <h1 style={{ margin: "6px 0 0 0", fontSize: 30 }}>役をカスタム</h1>
+          <div style={{ marginTop: 8, fontSize: 15 }}>
+            表示されない役はここでONにしてください
           </div>
         </div>
 
         <div style={{ display: "grid", gap: 12 }}>
-          {sortedEvents.map((e) => {
-            const isFixed = fixedKeys.includes(e.key);
-            const customIndex = customEvents.findIndex((x) => x.key === e.key);
-            const canMoveUp = !isFixed && customIndex > 0;
-            const canMoveDown = !isFixed && customIndex < customEvents.length - 1;
-
-            return (
+          {events.map((event, index) => (
+            <div
+              key={event.key}
+              style={{
+                border: "1px solid #e2e8f0",
+                borderRadius: 18,
+                padding: 14,
+                background: "#f8fafc"
+              }}
+            >
               <div
-                key={e.key}
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "2fr 120px 110px 90px auto auto auto",
-                  gap: 10,
-                  alignItems: "center",
-                  padding: 14,
-                  borderRadius: 16,
-                  border: "1px solid #e2e8f0",
-                  background: isFixed ? "#eff6ff" : "#f8fafc"
+                  gridTemplateColumns: "1fr",
+                  gap: 10
                 }}
               >
-                <input
-                  value={e.label}
-                  onChange={(ev) => updateByKey(e.key, "label", ev.target.value)}
-                  style={inputStyle}
-                />
-
-                <input
-                  type="number"
-                  value={e.point}
-                  onChange={(ev) =>
-                    updateByKey(e.key, "point", Number(ev.target.value))
-                  }
-                  style={inputStyle}
-                />
-
-                <label
+                <div
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    fontWeight: 700,
-                    color: "#334155",
-                    justifyContent: "center"
+                    fontSize: 18,
+                    fontWeight: 900,
+                    color: "#0f172a",
+                    whiteSpace: "normal",
+                    overflowWrap: "break-word"
                   }}
                 >
+                  {event.label}
+                </div>
+
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 120px",
+                    gap: 10,
+                    alignItems: "center"
+                  }}
+                >
+                  <button
+                    onClick={() => toggleActive(index)}
+                    style={{
+                      padding: "12px 14px",
+                      borderRadius: 12,
+                      border: "none",
+                      background: event.active ? "#16a34a" : "#94a3b8",
+                      color: "#ffffff",
+                      fontWeight: "bold",
+                      cursor: "pointer"
+                    }}
+                  >
+                    {event.active ? "ON" : "OFF"}
+                  </button>
+
                   <input
-                    type="checkbox"
-                    checked={e.single}
-                    onChange={(ev) =>
-                      updateByKey(e.key, "single", ev.target.checked)
-                    }
+                    type="number"
+                    value={event.point}
+                    onChange={(e) => updatePoint(index, e.target.value)}
+                    style={{
+                      width: "100%",
+                      boxSizing: "border-box",
+                      padding: "12px 14px",
+                      borderRadius: 12,
+                      border: "1px solid #cbd5e1",
+                      fontSize: 16,
+                      background: "#ffffff"
+                    }}
                   />
-                  単一
-                </label>
+                </div>
 
-                <label
+                <div
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    fontWeight: 700,
-                    color: "#334155",
-                    justifyContent: "center"
+                    fontSize: 13,
+                    color: "#64748b",
+                    whiteSpace: "normal",
+                    overflowWrap: "break-word"
                   }}
                 >
-                  <input
-                    type="checkbox"
-                    checked={e.active}
-                    onChange={(ev) =>
-                      updateByKey(e.key, "active", ev.target.checked)
-                    }
-                  />
-                  ON
-                </label>
-
-                <button
-                  onClick={() => moveCustomUp(e.key)}
-                  disabled={!canMoveUp}
-                  style={{
-                    padding: "10px 12px",
-                    borderRadius: 12,
-                    border: "none",
-                    background: canMoveUp ? "#64748b" : "#cbd5e1",
-                    color: "#fff",
-                    fontWeight: "bold",
-                    cursor: canMoveUp ? "pointer" : "not-allowed"
-                  }}
-                >
-                  ↑
-                </button>
-
-                <button
-                  onClick={() => moveCustomDown(e.key)}
-                  disabled={!canMoveDown}
-                  style={{
-                    padding: "10px 12px",
-                    borderRadius: 12,
-                    border: "none",
-                    background: canMoveDown ? "#64748b" : "#cbd5e1",
-                    color: "#fff",
-                    fontWeight: "bold",
-                    cursor: canMoveDown ? "pointer" : "not-allowed"
-                  }}
-                >
-                  ↓
-                </button>
-
-                <button
-                  onClick={() => removeByKey(e.key)}
-                  disabled={isFixed}
-                  style={{
-                    padding: "10px 14px",
-                    borderRadius: 12,
-                    border: "none",
-                    background: isFixed ? "#cbd5e1" : "#ef4444",
-                    color: "#fff",
-                    fontWeight: "bold",
-                    cursor: isFixed ? "not-allowed" : "pointer"
-                  }}
-                >
-                  削除
-                </button>
+                  {event.single
+                    ? "この役は単独系です（同時に1つだけ）"
+                    : "この役は他の役と同時に選べます"}
+                </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
 
         <div
           style={{
-            display: "flex",
-            gap: 12,
-            justifyContent: "space-between",
-            marginTop: 22,
-            flexWrap: "wrap"
+            display: "grid",
+            gridTemplateColumns: "1fr",
+            gap: 10,
+            marginTop: 18
           }}
         >
           <button
-            onClick={addEvent}
+            onClick={saveEvents}
             style={{
-              padding: "14px 20px",
+              padding: "14px 16px",
               borderRadius: 14,
               border: "none",
               background: "#2563eb",
-              color: "#fff",
+              color: "#ffffff",
               fontWeight: "bold",
+              fontSize: 16,
               cursor: "pointer"
             }}
           >
-            ＋追加
+            保存して戻る
           </button>
 
-          <div style={{ display: "flex", gap: 12 }}>
-            <button
-              onClick={() => nav("/")}
-              style={{
-                padding: "14px 20px",
-                borderRadius: 14,
-                border: "1px solid #cbd5e1",
-                background: "#fff",
-                color: "#0f172a",
-                fontWeight: "bold",
-                cursor: "pointer"
-              }}
-            >
-              戻る
-            </button>
+          <button
+            onClick={resetEvents}
+            style={{
+              padding: "14px 16px",
+              borderRadius: 14,
+              border: "1px solid #cbd5e1",
+              background: "#ffffff",
+              color: "#0f172a",
+              fontWeight: "bold",
+              fontSize: 16,
+              cursor: "pointer"
+            }}
+          >
+            初期値に戻す
+          </button>
 
-            <button
-              onClick={save}
-              style={{
-                padding: "14px 20px",
-                borderRadius: 14,
-                border: "none",
-                background: "linear-gradient(135deg, #16a34a 0%, #15803d 100%)",
-                color: "#fff",
-                fontWeight: "bold",
-                cursor: "pointer"
-              }}
-            >
-              保存
-            </button>
-          </div>
+          <button
+            onClick={() => navigate("/")}
+            style={{
+              padding: "14px 16px",
+              borderRadius: 14,
+              border: "1px solid #cbd5e1",
+              background: "#ffffff",
+              color: "#0f172a",
+              fontWeight: "bold",
+              fontSize: 16,
+              cursor: "pointer"
+            }}
+          >
+            トップへ戻る
+          </button>
         </div>
       </div>
     </div>
   );
 }
-
-const inputStyle = {
-  width: "100%",
-  boxSizing: "border-box",
-  padding: "12px 14px",
-  borderRadius: 12,
-  border: "1px solid #cbd5e1",
-  background: "#ffffff",
-  fontSize: 16
-};
