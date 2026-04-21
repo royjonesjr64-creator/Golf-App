@@ -507,135 +507,93 @@ export default function Result() {
                       const holeOpen = !!openHoles[holeKey];
 
                       return (
-                        <div
-                          key={i}
-                          style={{
-                            background: "#ffffff",
-                            border: "1px solid #e5e7eb",
-                            borderRadius: 14,
-                            padding: 10
-                          }}
-                        >
-                          <button
-                            onClick={() => toggleHoleOpen(summary.playerName, r.hole)}
-                            style={{
-                              width: "100%",
-                              border: "none",
-                              background: "transparent",
-                              cursor: "pointer",
-                              padding: 0,
-                              textAlign: "left"
-                            }}
-                          >
-                            <div
-                              style={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                                gap: 8,
-                                flexWrap: "wrap"
-                              }}
-                            >
-                              <div style={{ fontWeight: 900, fontSize: 16 }}>
-                                H{r.hole}
-                              </div>
+  <div
+    key={i}
+    style={{
+      background: "#ffffff",
+      border: "1px solid #e5e7eb",
+      borderRadius: 14,
+      overflow: "hidden"
+    }}
+  >
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "50px 120px 80px 90px 90px 70px 60px 40px",
+        alignItems: "center",
+        gap: 6,
+        padding: "10px 8px",
+        borderBottom: holeOpen ? "1px solid #e5e7eb" : "none",
+        fontSize: 13
+      }}
+    >
+      <div style={{ fontWeight: 800 }}>H{r.hole}</div>
 
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: 8,
-                                  flexWrap: "wrap"
-                                }}
-                              >
-                                <div
-                                  style={{
-                                    padding: "4px 10px",
-                                    borderRadius: 999,
-                                    background: "#ffffff",
-                                    border: `2px solid ${r.diffColor}`,
-                                    color: r.diffColor,
-                                    fontWeight: 900,
-                                    fontSize: 14
-                                  }}
-                                >
-                                  {r.score}打 / {r.diffLabel}
-                                </div>
+      <div
+        style={{
+          padding: "4px 8px",
+          borderRadius: 999,
+          border: `2px solid ${r.diffColor}`,
+          color: r.diffColor,
+          fontWeight: 900,
+          textAlign: "center",
+          whiteSpace: "nowrap"
+        }}
+      >
+        {r.score}打 / {r.diffLabel}
+      </div>
 
-                                <div
-                                  style={{
-                                    fontSize: 12,
-                                    color: "#64748b",
-                                    fontWeight: 700
-                                  }}
-                                >
-                                  {holeOpen ? "▲ 閉じる" : "▼ 開く"}
-                                </div>
-                              </div>
-                            </div>
-                          </button>
+      <div style={{ fontWeight: 700 }}>
+        {r.driveDistance ? `${r.driveDistance}Y` : "-"}
+      </div>
 
-                          {holeOpen && (
-                            <>
-                              <div
-                                style={{
-                                  display: "grid",
-                                  gridTemplateColumns: "1fr 1fr",
-                                  gap: 8,
-                                  marginTop: 8
-                                }}
-                              >
-                                <MiniBox label="100Y以内" value={r.inside100} />
-                                <MiniBox label="ON距離" value={r.greenOnDistance || "-"} />
-                                <MiniBox label="1打目飛距離" value={r.driveDistance || "-"} />
-                                <MiniBox
-                                  label="FW / ワンオン"
-                                  value={
-                                    r.par === 3
-                                      ? r.fairwayKeep === "keep"
-                                        ? "ワンオン○"
-                                        : "-"
-                                      : r.club === "Driver"
-                                        ? r.fairwayKeep === "keep"
-                                          ? "FW○"
-                                          : "-"
-                                        : "-"
-                                  }
-                                />
-                              </div>
+      <div>{r.club}</div>
 
-                              <div
-                                style={{
-                                  display: "grid",
-                                  gridTemplateColumns: "1fr 1fr 1fr",
-                                  gap: 8,
-                                  marginTop: 8
-                                }}
-                              >
-                                <MiniBox
-                                  label="GIR"
-                                  value={r.gir ? "○" : "-"}
-                                  valueColor={r.gir ? "#16a34a" : "#64748b"}
-                                />
-                                <MiniBox label="クラブ" value={r.club} />
-                                <MiniBox label="パット" value={r.putt} />
-                              </div>
+      <div>
+        {r.par === 3
+          ? r.fairwayKeep === "keep"
+            ? "ON○"
+            : "-"
+          : r.club === "Driver"
+            ? r.fairwayKeep === "keep"
+              ? "FW○"
+              : "-"
+            : "-"}
+      </div>
 
-                              <div
-                                style={{
-                                  display: "grid",
-                                  gridTemplateColumns: "1fr 80px",
-                                  gap: 8,
-                                  marginTop: 8
-                                }}
-                              >
-                                <MiniBox label="役" value={r.roleText} />
-                                <MiniBox label="OP" value={r.olympicPoint} />
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      );
+      <div style={{ textAlign: "center" }}>{r.inside100}</div>
+
+      <div style={{ textAlign: "center" }}>{r.putt}</div>
+
+      <div
+        onClick={() => toggleHoleOpen(summary.playerName, r.hole)}
+        style={{
+          cursor: "pointer",
+          fontSize: 12,
+          fontWeight: 800,
+          textAlign: "center"
+        }}
+      >
+        {holeOpen ? "▲" : "▼"}
+      </div>
+    </div>
+
+    {holeOpen && (
+      <div style={{ padding: 10 }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 80px",
+            gap: 8
+          }}
+        >
+          <MiniBox label="役" value={r.roleText} />
+          <MiniBox label="OP" value={r.olympicPoint} />
+        </div>
+      </div>
+    )}
+  </div>
+);
                     })}
                   </div>
                 </div>
