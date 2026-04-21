@@ -518,8 +518,7 @@ export default function Result() {
   >
     <div
       style={{
-        display: "grid",
-        gridTemplateColumns: "50px 120px 80px 90px 90px 70px 60px 40px",
+        display: "grid",gridTemplateColumns: "46px 42px 72px 82px 82px 62px 52px 36px",
         alignItems: "center",
         gap: 6,
         padding: "10px 8px",
@@ -529,19 +528,15 @@ export default function Result() {
     >
       <div style={{ fontWeight: 800 }}>H{r.hole}</div>
 
-      <div
-        style={{
-          padding: "4px 8px",
-          borderRadius: 999,
-          border: `2px solid ${r.diffColor}`,
-          color: r.diffColor,
-          fontWeight: 900,
-          textAlign: "center",
-          whiteSpace: "nowrap"
-        }}
-      >
-        {r.score}打 / {r.diffLabel}
-      </div>
+     <div
+  style={{
+    fontWeight: 900,
+    textAlign: "center",
+    color: r.diffColor
+  }}
+>
+  {r.score - r.par > 0 ? `+${r.score - r.par}` : r.score - r.par}
+</div>
 
       <div style={{ fontWeight: 700 }}>
         {r.driveDistance ? `${r.driveDistance}Y` : "-"}
