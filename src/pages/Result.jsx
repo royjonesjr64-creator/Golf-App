@@ -10,10 +10,47 @@ function StatChip({ label, value }) {
         background: "#ffffff",
         border: "1px solid #dbe2ea",
         fontWeight: 800,
-        fontSize: 13
+        fontSize: 12,
+        whiteSpace: "nowrap"
       }}
     >
       {label}：{value}
+    </div>
+  );
+}
+
+function MiniBox({ label, value, valueColor = "#0f172a" }) {
+  return (
+    <div
+      style={{
+        padding: 8,
+        borderRadius: 10,
+        background: "#f8fafc",
+        border: "1px solid #e2e8f0",
+        minWidth: 0
+      }}
+    >
+      <div
+        style={{
+          fontSize: 11,
+          color: "#64748b",
+          marginBottom: 2
+        }}
+      >
+        {label}
+      </div>
+      <div
+        style={{
+          fontWeight: 800,
+          fontSize: 14,
+          color: valueColor,
+          whiteSpace: "normal",
+          overflowWrap: "break-word",
+          lineHeight: 1.25
+        }}
+      >
+        {value}
+      </div>
     </div>
   );
 }
@@ -49,6 +86,7 @@ function isGir(score, putt, par) {
 export default function Result() {
   const nav = useNavigate();
   const [openPlayers, setOpenPlayers] = useState({});
+  const [openHoles, setOpenHoles] = useState({});
 
   const rawRounds = JSON.parse(localStorage.getItem("rounds") || "[]");
   const rounds = rawRounds.filter((r) => r && r.players);
@@ -181,6 +219,14 @@ export default function Result() {
     }));
   };
 
+  const toggleHoleOpen = (playerName, hole) => {
+    const key = `${playerName}_${hole}`;
+    setOpenHoles((prev) => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
   const handleSave = () => {
     const saved = JSON.parse(localStorage.getItem("history") || "[]");
 
@@ -208,17 +254,17 @@ export default function Result() {
       style={{
         minHeight: "100vh",
         background: "linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%)",
-        padding: 12,
+        padding: 10,
         boxSizing: "border-box"
       }}
     >
       <div
         style={{
-          maxWidth: 1220,
+          maxWidth: 1100,
           margin: "0 auto",
           background: "#ffffff",
-          borderRadius: 28,
-          padding: 16,
+          borderRadius: 24,
+          padding: 12,
           boxShadow: "0 18px 40px rgba(15,23,42,0.10)"
         }}
       >
@@ -226,22 +272,22 @@ export default function Result() {
           style={{
             background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
             color: "#ffffff",
-            borderRadius: 24,
-            padding: 20,
-            marginBottom: 18,
+            borderRadius: 20,
+            padding: 16,
+            marginBottom: 14,
             textAlign: "center"
           }}
         >
-          <div style={{ fontSize: 13, opacity: 0.9 }}>ROUND RESULT</div>
-          <h1 style={{ margin: "6px 0 0 0", fontSize: 34 }}>結果</h1>
-          <div style={{ marginTop: 10, fontSize: 20, fontWeight: 800 }}>
+          <div style={{ fontSize: 12, opacity: 0.9 }}>ROUND RESULT</div>
+          <h1 style={{ margin: "4px 0 0 0", fontSize: 28 }}>結果</h1>
+          <div style={{ marginTop: 8, fontSize: 18, fontWeight: 800 }}>
             {golfName}
           </div>
           {courseName ? (
-            <div style={{ marginTop: 4, fontSize: 15 }}>{courseName}</div>
+            <div style={{ marginTop: 4, fontSize: 14 }}>{courseName}</div>
           ) : null}
           {playDate ? (
-            <div style={{ marginTop: 4, fontSize: 13 }}>{playDate}</div>
+            <div style={{ marginTop: 4, fontSize: 12 }}>{playDate}</div>
           ) : null}
         </div>
 
@@ -249,24 +295,24 @@ export default function Result() {
           style={{
             background: "#f8fafc",
             border: "1px solid #e2e8f0",
-            borderRadius: 20,
-            padding: 14,
-            marginBottom: 18
+            borderRadius: 18,
+            padding: 12,
+            marginBottom: 14
           }}
         >
-          <h2 style={{ marginTop: 0, marginBottom: 12, fontSize: 22 }}>
+          <h2 style={{ marginTop: 0, marginBottom: 10, fontSize: 20 }}>
             全員スコア一覧
           </h2>
 
-          <div style={{ display: "grid", gap: 12 }}>
+          <div style={{ display: "grid", gap: 10 }}>
             {ranking.map((player, idx) => (
               <div
                 key={player.playerName}
                 style={{
                   background: "#ffffff",
                   border: idx === 0 ? "2px solid #f59e0b" : "1px solid #dbe2ea",
-                  borderRadius: 18,
-                  padding: 14,
+                  borderRadius: 16,
+                  padding: 12,
                   boxShadow:
                     idx === 0
                       ? "0 8px 20px rgba(245,158,11,0.18)"
@@ -278,7 +324,7 @@ export default function Result() {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    gap: 12,
+                    gap: 10,
                     flexWrap: "wrap"
                   }}
                 >
@@ -286,14 +332,14 @@ export default function Result() {
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: 12,
+                      gap: 10,
                       flexWrap: "wrap"
                     }}
                   >
                     <div
                       style={{
-                        minWidth: 52,
-                        height: 52,
+                        minWidth: 42,
+                        height: 42,
                         borderRadius: 999,
                         display: "flex",
                         alignItems: "center",
@@ -301,7 +347,7 @@ export default function Result() {
                         background: idx === 0 ? "#fef3c7" : "#eff6ff",
                         color: idx === 0 ? "#b45309" : "#1d4ed8",
                         fontWeight: 900,
-                        fontSize: 20
+                        fontSize: 18
                       }}
                     >
                       {idx + 1}
@@ -310,7 +356,7 @@ export default function Result() {
                     <div>
                       <div
                         style={{
-                          fontSize: 20,
+                          fontSize: 18,
                           fontWeight: 900,
                           color: "#0f172a"
                         }}
@@ -319,8 +365,8 @@ export default function Result() {
                       </div>
                       <div
                         style={{
-                          marginTop: 4,
-                          fontSize: 13,
+                          marginTop: 2,
+                          fontSize: 12,
                           color: "#64748b"
                         }}
                       >
@@ -332,19 +378,19 @@ export default function Result() {
                   <div
                     style={{
                       display: "flex",
-                      gap: 8,
+                      gap: 6,
                       flexWrap: "wrap",
                       alignItems: "center"
                     }}
                   >
                     <div
                       style={{
-                        padding: "8px 14px",
+                        padding: "6px 12px",
                         borderRadius: 999,
                         background: "#f8fafc",
                         border: "1px solid #dbe2ea",
                         fontWeight: 900,
-                        fontSize: 20,
+                        fontSize: 18,
                         color: "#0f172a"
                       }}
                     >
@@ -353,7 +399,7 @@ export default function Result() {
 
                     <div
                       style={{
-                        padding: "8px 14px",
+                        padding: "6px 12px",
                         borderRadius: 999,
                         background: player.diff <= 0 ? "#f0fdf4" : "#fef2f2",
                         border: `1px solid ${
@@ -384,14 +430,14 @@ export default function Result() {
           </div>
         </div>
 
-        <div style={{ display: "grid", gap: 12 }}>
+        <div style={{ display: "grid", gap: 10 }}>
           {playerSummaries.map((summary) => (
             <div
               key={summary.playerName}
               style={{
                 background: "#f8fafc",
                 border: "1px solid #e2e8f0",
-                borderRadius: 20,
+                borderRadius: 18,
                 overflow: "hidden"
               }}
             >
@@ -401,7 +447,7 @@ export default function Result() {
                   width: "100%",
                   border: "none",
                   background: "transparent",
-                  padding: 16,
+                  padding: 12,
                   cursor: "pointer",
                   textAlign: "left"
                 }}
@@ -411,17 +457,17 @@ export default function Result() {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    gap: 12,
+                    gap: 10,
                     flexWrap: "wrap"
                   }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-                    <div style={{ fontSize: 22, fontWeight: 900 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                    <div style={{ fontSize: 20, fontWeight: 900 }}>
                       {summary.playerName}
                     </div>
                     <div
                       style={{
-                        padding: "6px 12px",
+                        padding: "5px 10px",
                         borderRadius: 999,
                         background: "#ffffff",
                         border: "1px solid #dbe2ea",
@@ -433,7 +479,7 @@ export default function Result() {
                     </div>
                   </div>
 
-                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                     <StatChip
                       label="平均Driver"
                       value={
@@ -454,122 +500,143 @@ export default function Result() {
               </button>
 
               {openPlayers[summary.playerName] && (
-                <div style={{ padding: "0 12px 12px 12px" }}>
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr",
-                      gap: 10
-                    }}
-                  >
-                    {summary.rounds.map((r, i) => (
-                      <div
-                        key={i}
-                        style={{
-                          background: "#ffffff",
-                          border: "1px solid #e5e7eb",
-                          borderRadius: 16,
-                          padding: 14
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            gap: 10,
-                            flexWrap: "wrap",
-                            marginBottom: 10
-                          }}
-                        >
-                          <div style={{ fontWeight: 900, fontSize: 18 }}>
-                            H{r.hole}
-                          </div>
-                          <div
-                            style={{
-                              padding: "6px 12px",
-                              borderRadius: 999,
-                              background: "#ffffff",
-                              border: `2px solid ${r.diffColor}`,
-                              color: r.diffColor,
-                              fontWeight: 900
-                            }}
-                          >
-                            {r.score}打 / {r.diffLabel}
-                          </div>
-                        </div>
+                <div style={{ padding: "0 10px 10px 10px" }}>
+                  <div style={{ display: "grid", gap: 8 }}>
+                    {summary.rounds.map((r, i) => {
+                      const holeKey = `${summary.playerName}_${r.hole}`;
+                      const holeOpen = !!openHoles[holeKey];
 
+                      return (
                         <div
+                          key={i}
                           style={{
-                            display: "grid",
-                            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-                            gap: 10
+                            background: "#ffffff",
+                            border: "1px solid #e5e7eb",
+                            borderRadius: 14,
+                            padding: 10
                           }}
                         >
-                          <InfoBox label="100Y以内" value={r.inside100} />
-                          <InfoBox
-                            label="ON距離"
-                            value={r.greenOnDistance || "-"}
-                          />
-                          <InfoBox
-                            label="1打目飛距離"
-                            value={r.driveDistance || "-"}
-                          />
-                          <InfoBox
-                            label="FW / ワンオン"
-                            value={
-                              r.par === 3
-                                ? r.fairwayKeep === "keep"
-                                  ? "ワンオン○"
-                                  : "-"
-                                : r.club === "Driver"
-                                  ? r.fairwayKeep === "keep"
-                                    ? "FW○"
-                                    : "-"
-                                  : "-"
-                            }
-                          />
-                          <InfoBox
-                            label="GIR"
-                            value={r.gir ? "○" : "-"}
-                            valueColor={r.gir ? "#16a34a" : "#64748b"}
-                          />
-                          <InfoBox label="クラブ" value={r.club} />
-                          <InfoBox label="パット" value={r.putt} />
-                          <InfoBox label="OP" value={r.olympicPoint} />
-                        </div>
+                          <button
+                            onClick={() => toggleHoleOpen(summary.playerName, r.hole)}
+                            style={{
+                              width: "100%",
+                              border: "none",
+                              background: "transparent",
+                              cursor: "pointer",
+                              padding: 0,
+                              textAlign: "left"
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                gap: 8,
+                                flexWrap: "wrap"
+                              }}
+                            >
+                              <div style={{ fontWeight: 900, fontSize: 16 }}>
+                                H{r.hole}
+                              </div>
 
-                        <div
-                          style={{
-                            marginTop: 10,
-                            padding: 10,
-                            borderRadius: 12,
-                            background: "#f8fafc",
-                            border: "1px solid #e2e8f0"
-                          }}
-                        >
-                          <div
-                            style={{
-                              fontSize: 12,
-                              color: "#64748b",
-                              marginBottom: 4
-                            }}
-                          >
-                            役
-                          </div>
-                          <div
-                            style={{
-                              fontWeight: 700,
-                              color: "#0f172a",
-                              whiteSpace: "normal",
-                              overflowWrap: "break-word"
-                            }}
-                          >
-                            {r.roleText}
-                          </div>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 8,
+                                  flexWrap: "wrap"
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    padding: "4px 10px",
+                                    borderRadius: 999,
+                                    background: "#ffffff",
+                                    border: `2px solid ${r.diffColor}`,
+                                    color: r.diffColor,
+                                    fontWeight: 900,
+                                    fontSize: 14
+                                  }}
+                                >
+                                  {r.score}打 / {r.diffLabel}
+                                </div>
+
+                                <div
+                                  style={{
+                                    fontSize: 12,
+                                    color: "#64748b",
+                                    fontWeight: 700
+                                  }}
+                                >
+                                  {holeOpen ? "▲ 閉じる" : "▼ 開く"}
+                                </div>
+                              </div>
+                            </div>
+                          </button>
+
+                          {holeOpen && (
+                            <>
+                              <div
+                                style={{
+                                  display: "grid",
+                                  gridTemplateColumns: "1fr 1fr",
+                                  gap: 8,
+                                  marginTop: 8
+                                }}
+                              >
+                                <MiniBox label="100Y以内" value={r.inside100} />
+                                <MiniBox label="ON距離" value={r.greenOnDistance || "-"} />
+                                <MiniBox label="1打目飛距離" value={r.driveDistance || "-"} />
+                                <MiniBox
+                                  label="FW / ワンオン"
+                                  value={
+                                    r.par === 3
+                                      ? r.fairwayKeep === "keep"
+                                        ? "ワンオン○"
+                                        : "-"
+                                      : r.club === "Driver"
+                                        ? r.fairwayKeep === "keep"
+                                          ? "FW○"
+                                          : "-"
+                                        : "-"
+                                  }
+                                />
+                              </div>
+
+                              <div
+                                style={{
+                                  display: "grid",
+                                  gridTemplateColumns: "1fr 1fr 1fr",
+                                  gap: 8,
+                                  marginTop: 8
+                                }}
+                              >
+                                <MiniBox
+                                  label="GIR"
+                                  value={r.gir ? "○" : "-"}
+                                  valueColor={r.gir ? "#16a34a" : "#64748b"}
+                                />
+                                <MiniBox label="クラブ" value={r.club} />
+                                <MiniBox label="パット" value={r.putt} />
+                              </div>
+
+                              <div
+                                style={{
+                                  display: "grid",
+                                  gridTemplateColumns: "1fr 80px",
+                                  gap: 8,
+                                  marginTop: 8
+                                }}
+                              >
+                                <MiniBox label="役" value={r.roleText} />
+                                <MiniBox label="OP" value={r.olympicPoint} />
+                              </div>
+                            </>
+                          )}
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -582,7 +649,7 @@ export default function Result() {
             display: "flex",
             justifyContent: "center",
             gap: 12,
-            marginTop: 22,
+            marginTop: 18,
             flexWrap: "wrap"
           }}
         >
@@ -620,54 +687,3 @@ export default function Result() {
     </div>
   );
 }
-
-function InfoBox({ label, value, valueColor = "#0f172a" }) {
-  return (
-    <div
-      style={{
-        padding: 10,
-        borderRadius: 12,
-        background: "#f8fafc",
-        border: "1px solid #e2e8f0",
-        minWidth: 0
-      }}
-    >
-      <div
-        style={{
-          fontSize: 12,
-          color: "#64748b",
-          marginBottom: 4
-        }}
-      >
-        {label}
-      </div>
-      <div
-        style={{
-          fontWeight: 800,
-          color: valueColor,
-          whiteSpace: "normal",
-          overflowWrap: "break-word"
-        }}
-      >
-        {value}
-      </div>
-    </div>
-  );
-}
-
-const thStyle = {
-  padding: "10px 8px",
-  border: "1px solid #dbe2ea",
-  fontSize: 13,
-  fontWeight: 800,
-  textAlign: "center",
-  whiteSpace: "nowrap"
-};
-
-const tdStyle = {
-  padding: "10px 8px",
-  border: "1px solid #e5e7eb",
-  fontSize: 13,
-  textAlign: "center",
-  whiteSpace: "nowrap"
-};
