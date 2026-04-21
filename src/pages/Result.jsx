@@ -50,7 +50,8 @@ export default function Result() {
   const nav = useNavigate();
   const [openPlayers, setOpenPlayers] = useState({});
 
-  const rounds = JSON.parse(localStorage.getItem("rounds") || "[]");
+  const rawRounds = JSON.parse(localStorage.getItem("rounds") || "[]");
+  const rounds = rawRounds.filter((r) => r && r.players);
   const pars = JSON.parse(localStorage.getItem("pars") || "[]");
   const players = JSON.parse(localStorage.getItem("players") || "[]");
   const events = JSON.parse(localStorage.getItem("events") || "[]");
@@ -207,7 +208,7 @@ export default function Result() {
       style={{
         minHeight: "100vh",
         background: "linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%)",
-        padding: 20,
+        padding: 12,
         boxSizing: "border-box"
       }}
     >
@@ -217,7 +218,7 @@ export default function Result() {
           margin: "0 auto",
           background: "#ffffff",
           borderRadius: 28,
-          padding: 20,
+          padding: 16,
           boxShadow: "0 18px 40px rgba(15,23,42,0.10)"
         }}
       >
@@ -453,62 +454,71 @@ export default function Result() {
               </button>
 
               {openPlayers[summary.playerName] && (
-                <div style={{ padding: "0 16px 16px 16px" }}>
-                  <div style={{ overflowX: "auto" }}>
-                    <table
-                      style={{
-                        width: "100%",
-                        borderCollapse: "collapse",
-                        minWidth: 1320,
-                        background: "#ffffff",
-                        borderRadius: 16,
-                        overflow: "hidden"
-                      }}
-                    >
-                      <thead>
-                        <tr style={{ background: "#f8fafc" }}>
-                          <th style={thStyle}>H</th>
-                          <th style={thStyle}>打数</th>
-                          <th style={thStyle}>比較</th>
-                          <th style={thStyle}>100Y以内</th>
-                          <th style={thStyle}>ON距離</th>
-                          <th style={thStyle}>1打目飛距離</th>
-                          <th style={thStyle}>FW / ワンオン</th>
-                          <th style={thStyle}>GIR</th>
-                          <th style={thStyle}>クラブ</th>
-                          <th style={thStyle}>パット</th>
-                          <th style={thStyle}>役</th>
-                          <th style={thStyle}>OP</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {summary.rounds.map((r, i) => (
-                          <tr key={i}>
-                            <td style={tdStyle}>H{r.hole}</td>
-                            <td
-                              style={{
-                                ...tdStyle,
-                                fontWeight: 900,
-                                color: r.diffColor,
-                                fontSize: 15
-                              }}
-                            >
-                              {r.score}
-                            </td>
-                            <td
-                              style={{
-                                ...tdStyle,
-                                fontWeight: 800,
-                                color: r.diffColor
-                              }}
-                            >
-                              {r.diffLabel}
-                            </td>
-                            <td style={tdStyle}>{r.inside100}</td>
-                            <td style={tdStyle}>{r.greenOnDistance || "-"}</td>
-                            <td style={tdStyle}>{r.driveDistance || "-"}</td>
-                            <td style={tdStyle}>
-                              {r.par === 3
+                <div style={{ padding: "0 12px 12px 12px" }}>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr",
+                      gap: 10
+                    }}
+                  >
+                    {summary.rounds.map((r, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          background: "#ffffff",
+                          border: "1px solid #e5e7eb",
+                          borderRadius: 16,
+                          padding: 14
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            gap: 10,
+                            flexWrap: "wrap",
+                            marginBottom: 10
+                          }}
+                        >
+                          <div style={{ fontWeight: 900, fontSize: 18 }}>
+                            H{r.hole}
+                          </div>
+                          <div
+                            style={{
+                              padding: "6px 12px",
+                              borderRadius: 999,
+                              background: "#ffffff",
+                              border: `2px solid ${r.diffColor}`,
+                              color: r.diffColor,
+                              fontWeight: 900
+                            }}
+                          >
+                            {r.score}打 / {r.diffLabel}
+                          </div>
+                        </div>
+
+                        <div
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                            gap: 10
+                          }}
+                        >
+                          <InfoBox label="100Y以内" value={r.inside100} />
+                          <InfoBox
+                            label="ON距離"
+                            value={r.greenOnDistance || "-"}
+                          />
+                          <InfoBox
+                            label="1打目飛距離"
+                            value={r.driveDistance || "-"}
+                          />
+                          <InfoBox
+                            label="FW / ワンオン"
+                            value={
+                              r.par === 3
                                 ? r.fairwayKeep === "keep"
                                   ? "ワンオン○"
                                   : "-"
@@ -516,25 +526,50 @@ export default function Result() {
                                   ? r.fairwayKeep === "keep"
                                     ? "FW○"
                                     : "-"
-                                  : "-"}
-                            </td>
-                            <td
-                              style={{
-                                ...tdStyle,
-                                color: r.gir ? "#16a34a" : "#64748b",
-                                fontWeight: 800
-                              }}
-                            >
-                              {r.gir ? "○" : "-"}
-                            </td>
-                            <td style={tdStyle}>{r.club}</td>
-                            <td style={tdStyle}>{r.putt}</td>
-                            <td style={{ ...tdStyle, textAlign: "left" }}>{r.roleText}</td>
-                            <td style={tdStyle}>{r.olympicPoint}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                                  : "-"
+                            }
+                          />
+                          <InfoBox
+                            label="GIR"
+                            value={r.gir ? "○" : "-"}
+                            valueColor={r.gir ? "#16a34a" : "#64748b"}
+                          />
+                          <InfoBox label="クラブ" value={r.club} />
+                          <InfoBox label="パット" value={r.putt} />
+                          <InfoBox label="OP" value={r.olympicPoint} />
+                        </div>
+
+                        <div
+                          style={{
+                            marginTop: 10,
+                            padding: 10,
+                            borderRadius: 12,
+                            background: "#f8fafc",
+                            border: "1px solid #e2e8f0"
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: 12,
+                              color: "#64748b",
+                              marginBottom: 4
+                            }}
+                          >
+                            役
+                          </div>
+                          <div
+                            style={{
+                              fontWeight: 700,
+                              color: "#0f172a",
+                              whiteSpace: "normal",
+                              overflowWrap: "break-word"
+                            }}
+                          >
+                            {r.roleText}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
@@ -581,6 +616,40 @@ export default function Result() {
             トップに戻る
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function InfoBox({ label, value, valueColor = "#0f172a" }) {
+  return (
+    <div
+      style={{
+        padding: 10,
+        borderRadius: 12,
+        background: "#f8fafc",
+        border: "1px solid #e2e8f0",
+        minWidth: 0
+      }}
+    >
+      <div
+        style={{
+          fontSize: 12,
+          color: "#64748b",
+          marginBottom: 4
+        }}
+      >
+        {label}
+      </div>
+      <div
+        style={{
+          fontWeight: 800,
+          color: valueColor,
+          whiteSpace: "normal",
+          overflowWrap: "break-word"
+        }}
+      >
+        {value}
       </div>
     </div>
   );
