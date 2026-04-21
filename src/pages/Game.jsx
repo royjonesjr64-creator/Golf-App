@@ -14,21 +14,10 @@ export default function Game() {
       )
     : [];
 
-  const defaultEvents = [
-    { key: "birdie", label: "バーディ", point: 3, active: true, single: true },
-    { key: "eagle", label: "イーグル", point: 10, active: true, single: true },
-    { key: "par", label: "パー", point: 0, active: true, single: true },
-    { key: "bogey", label: "ボギー", point: -1, active: true, single: true },
-    { key: "fw_keep", label: "FWキープ", point: 1, active: true, single: false },
-    { key: "one_on", label: "ワンオン", point: 2, active: true, single: false },
-    { key: "sand_save", label: "サンドセーブ", point: 3, active: true, single: false }
-  ];
-
   const savedEvents = JSON.parse(localStorage.getItem("events") || "[]");
-  const activeEvents =
-    Array.isArray(savedEvents) && savedEvents.some((e) => e && e.active)
-      ? savedEvents.filter((e) => e && e.active)
-      : defaultEvents;
+  const activeEvents = Array.isArray(savedEvents)
+    ? savedEvents.filter((e) => e && e.active)
+    : [];
 
   const defaultClubs = [
     "Driver",
@@ -793,5 +782,382 @@ export default function Game() {
                   borderRadius: 14,
                   border: "1px solid #ef4444",
                   background: "#fff5f5",
+color: "#b91c1c",
+fontWeight: "bold",
+cursor: "pointer"
+                }}
+              >
+                クリア
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {driveModalPlayer !== null && (
+        <div
+          onClick={() => setDriveModalPlayer(null)}
+          style={modalBackdropStyle}
+        >
+          <div onClick={(e) => e.stopPropagation()} style={modalCardStyle}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 10,
+                marginBottom: 14
+              }}
+            >
+              <h2 style={{ margin: 0, fontSize: 20 }}>1打目飛距離</h2>
+              <button
+                onClick={() => setDriveModalPlayer(null)}
+                style={closeButtonStyle}
+              >
+                閉じる
+              </button>
+            </div>
+
+            <input
+              placeholder="例: 230"
+              value={rows[driveModalPlayer]?.driveDistance || ""}
+              onChange={(e) =>
+                updateRow(driveModalPlayer, "driveDistance", e.target.value)
+              }
+              style={inputStyle}
+            />
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr",
+                gap: 10,
+                marginTop: 14
+              }}
+            >
+              <button
+                onClick={() => setDriveModalPlayer(null)}
+                style={{
+                  padding: "14px 16px",
+                  borderRadius: 14,
+                  border: "1px solid #cbd5e1",
+                  background: "#ffffff",
+                  fontWeight: "bold",
+                  cursor: "pointer"
+                }}
+              >
+                OK
+              </button>
+
+              <button
+                onClick={() => {
+                  updateRow(driveModalPlayer, "driveDistance", "");
+                  setDriveModalPlayer(null);
+                }}
+                style={{
+                  padding: "14px 16px",
+                  borderRadius: 14,
+                  border: "1px solid #ef4444",
+                  background: "#fff5f5",
                   color: "#b91c1c",
-                  fontWeight:
+                  fontWeight: "bold",
+                  cursor: "pointer"
+                }}
+              >
+                クリア
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {puttModalPlayer !== null && (
+        <div
+          onClick={() => setPuttModalPlayer(null)}
+          style={modalBackdropStyle}
+        >
+          <div onClick={(e) => e.stopPropagation()} style={modalCardStyle}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 10,
+                marginBottom: 14
+              }}
+            >
+              <h2 style={{ margin: 0, fontSize: 20 }}>パット</h2>
+              <button
+                onClick={() => setPuttModalPlayer(null)}
+                style={closeButtonStyle}
+              >
+                閉じる
+              </button>
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(4, 1fr)",
+                gap: 10,
+                marginBottom: 14
+              }}
+            >
+              {[0, 1, 2, 3].map((n) => (
+                <button
+                  key={n}
+                  onClick={() => {
+                    updateRow(puttModalPlayer, "putt", String(n));
+                    setPuttModalPlayer(null);
+                  }}
+                  style={quickButtonStyle(
+                    Number(rows[puttModalPlayer]?.putt) === n
+                  )}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
+
+            <input
+              placeholder="4以上は手入力"
+              value={
+                [0, 1, 2, 3].includes(Number(rows[puttModalPlayer]?.putt))
+                  ? ""
+                  : rows[puttModalPlayer]?.putt || ""
+              }
+              onChange={(e) =>
+                updateRow(puttModalPlayer, "putt", e.target.value)
+              }
+              style={inputStyle}
+            />
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr",
+                gap: 10,
+                marginTop: 14
+              }}
+            >
+              <button
+                onClick={() => setPuttModalPlayer(null)}
+                style={{
+                  padding: "14px 16px",
+                  borderRadius: 14,
+                  border: "1px solid #cbd5e1",
+                  background: "#ffffff",
+                  fontWeight: "bold",
+                  cursor: "pointer"
+                }}
+              >
+                OK
+              </button>
+
+              <button
+                onClick={() => {
+                  updateRow(puttModalPlayer, "putt", "");
+                  setPuttModalPlayer(null);
+                }}
+                style={{
+                  padding: "14px 16px",
+                  borderRadius: 14,
+                  border: "1px solid #ef4444",
+                  background: "#fff5f5",
+                  color: "#b91c1c",
+                  fontWeight: "bold",
+                  cursor: "pointer"
+                }}
+              >
+                クリア
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {clubModalPlayer !== null && (
+        <div
+          onClick={() => setClubModalPlayer(null)}
+          style={modalBackdropStyle}
+        >
+          <div onClick={(e) => e.stopPropagation()} style={modalCardStyle}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 10,
+                marginBottom: 14
+              }}
+            >
+              <h2 style={{ margin: 0, fontSize: 20 }}>クラブ選択</h2>
+              <button
+                onClick={() => setClubModalPlayer(null)}
+                style={closeButtonStyle}
+              >
+                閉じる
+              </button>
+            </div>
+
+            <div style={{ display: "grid", gap: 10 }}>
+              {clubs.map((item, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    updateRow(clubModalPlayer, "club", item);
+                    setClubModalPlayer(null);
+                  }}
+                  style={{
+                    padding: "14px 16px",
+                    borderRadius: 14,
+                    border:
+                      rows[clubModalPlayer]?.club === item
+                        ? "2px solid #2563eb"
+                        : "1px solid #dbe2ea",
+                    background:
+                      rows[clubModalPlayer]?.club === item
+                        ? "#eff6ff"
+                        : "#ffffff",
+                    textAlign: "left",
+                    fontWeight: "bold",
+                    fontSize: 16,
+                    cursor: "pointer"
+                  }}
+                >
+                  {item}
+                </button>
+              ))}
+
+              <button
+                onClick={() => {
+                  updateRow(clubModalPlayer, "club", "");
+                  setClubModalPlayer(null);
+                }}
+                style={{
+                  padding: "14px 16px",
+                  borderRadius: 14,
+                  border: "1px solid #ef4444",
+                  background: "#fff5f5",
+                  color: "#b91c1c",
+                  textAlign: "left",
+                  fontWeight: "bold",
+                  fontSize: 16,
+                  cursor: "pointer"
+                }}
+              >
+                クラブ選択をクリア
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {eventModalPlayer !== null && (
+        <div
+          onClick={() => setEventModalPlayer(null)}
+          style={modalBackdropStyle}
+        >
+          <div onClick={(e) => e.stopPropagation()} style={modalCardStyle}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 10,
+                marginBottom: 14
+              }}
+            >
+              <h2 style={{ margin: 0, fontSize: 20 }}>役を選択</h2>
+              <button
+                onClick={() => setEventModalPlayer(null)}
+                style={closeButtonStyle}
+              >
+                閉じる
+              </button>
+            </div>
+
+            <div style={{ display: "grid", gap: 10 }}>
+              {activeEvents.length === 0 ? (
+                <div
+                  style={{
+                    padding: 14,
+                    borderRadius: 14,
+                    background: "#f8fafc",
+                    border: "1px solid #dbe2ea",
+                    color: "#64748b"
+                  }}
+                >
+                  有効な役がありません。役設定でONにしてください。
+                </div>
+              ) : (
+                activeEvents.map((event) => (
+                  <button
+                    key={event.key}
+                    type="button"
+                    onClick={() => toggleEvent(eventModalPlayer, event.key)}
+                    style={eventButtonStyle(
+                      !!rows[eventModalPlayer]?.eventChecks?.[event.key]
+                    )}
+                  >
+                    <span
+                      style={{
+                        flex: 1,
+                        minWidth: 0,
+                        whiteSpace: "normal",
+                        overflowWrap: "break-word"
+                      }}
+                    >
+                      {event.label}
+                    </span>
+                    <span style={{ color: "#64748b", flexShrink: 0 }}>
+                      {event.point > 0 ? `+${event.point}` : event.point}
+                    </span>
+                  </button>
+                ))
+              )}
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr",
+                gap: 10,
+                marginTop: 14
+              }}
+            >
+              <button
+                onClick={() => setEventModalPlayer(null)}
+                style={{
+                  padding: "14px 16px",
+                  borderRadius: 14,
+                  border: "1px solid #cbd5e1",
+                  background: "#ffffff",
+                  fontWeight: "bold",
+                  cursor: "pointer"
+                }}
+              >
+                OK
+              </button>
+
+              <button
+                onClick={() => updateRow(eventModalPlayer, "eventChecks", {})}
+                style={{
+                  padding: "14px 16px",
+                  borderRadius: 14,
+                  border: "1px solid #ef4444",
+                  background: "#fff5f5",
+                  color: "#b91c1c",
+                  fontWeight: "bold",
+                  cursor: "pointer"
+                }}
+              >
+                全解除
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
