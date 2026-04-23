@@ -22,34 +22,43 @@ export default function Top() {
           boxShadow: "0 18px 40px rgba(15,23,42,0.10)"
         }}
       >
-        <div
-         style={{
-  background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
-  color: "#ffffff",
-  borderRadius: 24,
-  padding: "24px 16px",
-  textAlign: "center",
-  marginBottom: 22
-}}
-        >
-          <div style={{ fontSize: 13, opacity: 0.9 }}>GOLF ROUND APP</div>
-       <h1
+       <div
   style={{
-    margin: "10px 0",
-    fontSize: "clamp(13px, 4vw, 15px)",
-    fontWeight: 800,
+    background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
+    color: "#ffffff",
+    borderRadius: 24,
+    padding: "24px 16px",
     textAlign: "center",
-    lineHeight: 1.6,
-    wordBreak: "keep-all",
-    overflowWrap: "normal"
+    marginBottom: 22
   }}
 >
-  ゴルフアプリ
-</h1>
-          <div style={{ fontSize: 15 }}>
-            スコア・パー・クラブ・パット・オリンピックを記録
-          </div>
-        </div>
+  <div style={{ fontSize: 13, opacity: 0.9 }}>GOLF ROUND APP</div>
+
+  <h1
+    style={{
+      margin: "10px 0",
+      fontSize: "clamp(20px, 8vw, 30px)",
+      fontWeight: 800,
+      textAlign: "center",
+      lineHeight: 1.2,
+      wordBreak: "keep-all",
+      overflowWrap: "normal"
+    }}
+  >
+    ゴルフアプリ
+  </h1>
+
+  <div
+    style={{
+      fontSize: "clamp(13px, 4vw, 15px)",
+      lineHeight: 1.6,
+      wordBreak: "keep-all",
+      overflowWrap: "normal"
+    }}
+  >
+    スコア・パー・クラブ・パット・オリンピックを記録
+  </div>
+</div>
 
         <div
           style={{
