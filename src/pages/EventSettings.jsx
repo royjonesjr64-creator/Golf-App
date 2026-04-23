@@ -261,19 +261,20 @@ export default function EventSettings() {
             役を追加
           </button>
 
-          <button
-            onClick={saveEvents}
-            style={{
-              ...buttonStyle,
-              background: "#2563eb",
-              color: "#ffffff",
-              border: "none"
-            }}
-          >
-            保存して戻る
-          </button>
-
-          <button
+         <button
+  onClick={() => {
+    localStorage.setItem("olympicEvents", JSON.stringify(events));
+    saveEvents();
+  }}
+  style={{
+    ...buttonStyle,
+    background: "#2563eb",
+    color: "#ffffff",
+    border: "none"
+  }}
+>
+  保存して戻る
+</button>
             onClick={resetEvents}
             style={{
               ...buttonStyle,
