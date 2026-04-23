@@ -23,21 +23,23 @@ export default function Top() {
         }}
       >
         <div
-          style={{
-            background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
-            color: "#ffffff",
-            borderRadius: 24,
-            padding: 28,
-            textAlign: "center",
-            marginBottom: 22
-          }}
+         style={{
+  background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
+  color: "#ffffff",
+  borderRadius: 24,
+  padding: "24px 16px",
+  textAlign: "center",
+  marginBottom: 22
+}}
         >
           <div style={{ fontSize: 13, opacity: 0.9 }}>GOLF ROUND APP</div>
-        <h1
+       <h1
   style={{
     margin: "10px 0",
-    fontSize: 26,
+    fontSize: "clamp(20px, 8vw, 30px)",
+    fontWeight: 800,
     textAlign: "center",
+    lineHeight: 1.2,
     wordBreak: "keep-all",
     overflowWrap: "normal"
   }}
