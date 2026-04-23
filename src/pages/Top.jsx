@@ -33,12 +33,13 @@ export default function Top() {
           }}
         >
           <div style={{ fontSize: 13, opacity: 0.9 }}>GOLF ROUND APP</div>
-         <h1
+        <h1
   style={{
     margin: "10px 0",
-    fontSize: 30,
-    whiteSpace: "nowrap",
-    letterSpacing: "2px"
+    fontSize: 26,
+    textAlign: "center",
+    wordBreak: "keep-all",
+    overflowWrap: "normal"
   }}
 >
   ゴルフアプリ
