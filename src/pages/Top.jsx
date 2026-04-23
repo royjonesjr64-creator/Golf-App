@@ -36,10 +36,10 @@ export default function Top() {
        <h1
   style={{
     margin: "10px 0",
-    fontSize: "clamp(20px, 8vw, 30px)",
+    fontSize: "clamp(13px, 4vw, 15px)",
     fontWeight: 800,
     textAlign: "center",
-    lineHeight: 1.2,
+    lineHeight: 1.6,
     wordBreak: "keep-all",
     overflowWrap: "normal"
   }}
