@@ -526,15 +526,13 @@ export default function Result() {
         fontSize: 13
       }}
     >
-      <div style={{ fontWeight: 900, textAlign: "center" }}>
-  H{r.hole}
-</div>
+      <div style={{ fontWeight: 800 }}>H{r.hole}</div>
 
-<div
+     <div
   style={{
     fontWeight: 900,
-    color: r.diffColor,
-    textAlign: "center"
+    textAlign: "center",
+    color: r.diffColor
   }}
 >
   {r.score - r.par > 0 ? `+${r.score - r.par}` : r.score - r.par}
@@ -549,11 +547,11 @@ export default function Result() {
       <div>
         {r.par === 3
           ? r.fairwayKeep === "keep"
-            ? "ON○"
+            ? "O○"
             : "-"
           : r.club === "Driver"
             ? r.fairwayKeep === "keep"
-              ? "FW○"
+              ? "F○"
               : "-"
             : "-"}
       </div>
