@@ -528,16 +528,13 @@ export default function Result() {
     >
       <div style={{ fontWeight: 800 }}>H{r.hole}</div>
 
-     <div
-  style={{
-    fontWeight: 900,
-    textAlign: "center",
-    color: r.diffColor
-  }}
->
-  {r.score - r.par > 0 ? `+${r.score - r.par}` : r.score - r.par}
+    <div style={{ fontWeight: 900, textAlign: "center" }}>
+  H{r.hole}
 </div>
 
+<div style={{ fontWeight: 900, textAlign: "center", color: r.diffColor }}>
+  {r.score - r.par > 0 ? `+${r.score - r.par}` : r.score - r.par}
+</div>
       <div style={{ fontWeight: 700 }}>
         {r.driveDistance ? `${r.driveDistance}Y` : "-"}
       </div>
