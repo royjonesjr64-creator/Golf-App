@@ -518,7 +518,7 @@ export default function Result() {
   >
     <div
       style={{
-        display: "grid",gridTemplateColumns: "32px 34px 54px 58px 40px 34px 28px 24px",
+        display: "grid",gridTemplateColumns: "22px 26px 52px 56px 26px 32px 26px 22px",
         alignItems: "center",
         gap: 6,
         padding: "10px 8px",
@@ -526,13 +526,15 @@ export default function Result() {
         fontSize: 13
       }}
     >
-      <div style={{ fontWeight: 800 }}>H{r.hole}</div>
+      <div style={{ fontWeight: 900, textAlign: "center" }}>
+  H{r.hole}
+</div>
 
-     <div
+<div
   style={{
     fontWeight: 900,
-    textAlign: "center",
-    color: r.diffColor
+    color: r.diffColor,
+    textAlign: "center"
   }}
 >
   {r.score - r.par > 0 ? `+${r.score - r.par}` : r.score - r.par}
