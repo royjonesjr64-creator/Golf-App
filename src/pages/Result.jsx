@@ -518,7 +518,7 @@ export default function Result() {
   >
     <div
       style={{
-        display: "grid",gridTemplateColumns: "46px 42px 72px 82px 82px 62px 52px 36px",
+        display: "grid",gridTemplateColumns: "32px 34px 54px 58px 40px 34px 28px 24px",
         alignItems: "center",
         gap: 6,
         padding: "10px 8px",
