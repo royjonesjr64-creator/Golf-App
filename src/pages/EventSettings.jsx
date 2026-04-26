@@ -297,7 +297,7 @@ export default function EventSettings() {
             トップへ戻る
           </button>
         </div>
-      </div>
+     
     </div>
   );
 }
