@@ -274,18 +274,17 @@ export default function EventSettings() {
   }}
 >
   保存して戻る
+<button
+  onClick={resetEvents}
+  style={{
+    ...buttonStyle,
+    background: "#ffffff",
+    color: "#2563eb",
+    border: "1px solid #93c5fd"
+  }}
+>
+  初期値に戻す
 </button>
-            onClick={resetEvents}
-            style={{
-              ...buttonStyle,
-              background: "#ffffff",
-              color: "#0f172a",
-              border: "1px solid #cbd5e1"
-            }}
-          >
-            初期値に戻す
-          </button>
-
           <button
             onClick={() => navigate("/")}
             style={{
