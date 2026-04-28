@@ -285,21 +285,19 @@ export default function EventSettings() {
 >
   初期値に戻す
 </button>
-          <button
-            onClick={() => navigate("/")}
-            style={{
-              ...buttonStyle,
-              background: "#ffffff",
-              color: "#0f172a",
-              border: "1px solid #cbd5e1"
-            }}
-          >
-                     トップへ戻る
+                <button
+          onClick={() => navigate("/")}
+          style={{
+            ...buttonStyle,
+            background: "#ffffff",
+            color: "#0f172a",
+            border: "1px solid #cbd5e1"
+          }}
+        >
+          トップへ戻る
         </button>
       </div>
-    </div>
-  </div>
-);
+  );
 }
 
 const inputStyle = {
