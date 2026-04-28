@@ -68,7 +68,10 @@ export default function Game() {
       fairwayKeep: "",
       club: "",
       putt: "",
-      eventChecks: {}
+      eventChecks: {},
+teeDirection: "",
+firstPuttSlope: "",
+firstPuttBreak: "",
     }),
     []
   );
@@ -860,6 +863,28 @@ export default function Game() {
                   }}
                 >
                   {currentRow.putt !== "" ? `P:${currentRow.putt}` : "パット"}
+<button
+  type="button"
+  onClick={() => updateHole("teeDirection", "↑")}
+  style={inputStyle}
+>
+  {currentRow.teeDirection || "方向"}
+</button>
+<button
+  type="button"
+  onClick={() => updateHole("firstPuttSlope", "上り")}
+  style={inputStyle}
+>
+  {currentRow.firstPuttSlope || "傾斜"}
+</button>
+
+<button
+  type="button"
+  onClick={() => updateHole("firstPuttBreak", "スライス")}
+  style={inputStyle}
+>
+  {currentRow.firstPuttBreak || "曲がり"}
+</button>
                 </button>
 
                 <button
