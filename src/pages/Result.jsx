@@ -541,18 +541,17 @@ export default function Result() {
 
       <div>{r.club}</div>
 
-      <div>
-        {r.par === 3
-          ? r.fairwayKeep === "keep"
-            ? "O○"
-            : "-"
-          : r.club === "Driver"
-            ? r.fairwayKeep === "keep"
-              ? "F○"
-              : "-"
-            : "-"}
-      </div>
-
+    <div style={{ textAlign: "center" }}>
+  {r.par === 3
+    ? r.fairwayKeep === "keep"
+      ? "◯"
+      : "-"
+    : r.club === "Driver"
+      ? r.fairwayKeep === "keep"
+        ? "◯"
+        : "-"
+      : "-"}
+</div>
       <div style={{ textAlign: "center" }}>{r.inside100}</div>
 
       <div style={{ textAlign: "center" }}>{r.putt}</div>
