@@ -294,12 +294,12 @@ export default function EventSettings() {
               border: "1px solid #cbd5e1"
             }}
           >
-            トップへ戻る
-          </button>
-        </div>
-     
+                     トップへ戻る
+        </button>
+      </div>
     </div>
-  );
+  </div>
+);
 }
 
 const inputStyle = {
