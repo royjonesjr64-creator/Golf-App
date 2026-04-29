@@ -711,7 +711,50 @@ firstPuttBreak: "",
                   Double
                 </button>
               </div>
+<div style={{ marginTop: 10 }}>
+  <div style={{ fontSize: 12, marginBottom: 6 }}>パット</div>
 
+  <div style={{ display: "flex", gap: 8 }}>
+    <button
+      onClick={() => updateHole("firstPuttDirection", "↑")}
+      style={{
+        flex: 1,
+        padding: 10,
+        borderRadius: 10,
+        border: "1px solid #ccc",
+        background: currentRow.firstPuttDirection ? "#dcfce7" : "#fff"
+      }}
+    >
+      方向
+    </button>
+
+    <button
+      onClick={() => updateHole("firstPuttSlope", "上り")}
+      style={{
+        flex: 1,
+        padding: 10,
+        borderRadius: 10,
+        border: "1px solid #ccc",
+        background: currentRow.firstPuttSlope ? "#dcfce7" : "#fff"
+      }}
+    >
+      傾斜
+    </button>
+
+    <button
+      onClick={() => updateHole("firstPuttBreak", "スライス")}
+      style={{
+        flex: 1,
+        padding: 10,
+        borderRadius: 10,
+        border: "1px solid #ccc",
+        background: currentRow.firstPuttBreak ? "#dcfce7" : "#fff"
+      }}
+    >
+      曲がり
+    </button>
+  </div>
+</div>
               <div
                 style={{
                   display: "grid",
@@ -863,40 +906,14 @@ firstPuttBreak: "",
                   }}
                 >
                   {currentRow.putt !== "" ? `P:${currentRow.putt}` : "パット"}
-<button
-  type="button"
-  onClick={() =>
-    updateRow(activePlayerIndex, "teeDirection", "↑")
-  }
-  style={inputStyle}
->
-  {currentRow.teeDirection || "方向"}
-</button>
-
-<button
-  type="button"
-  onClick={() =>
-    updateRow(activePlayerIndex, "firstPuttSlope", "上り")
-  }
-  style={inputStyle}
->
-  {currentRow.firstPuttSlope || "傾斜"}
-</button>
-
-<button
-  type="button"
-  onClick={() =>
-    updateRow(activePlayerIndex, "firstPuttBreak", "スライス")
-  }
-  style={inputStyle}
->
-  {currentRow.firstPuttBreak || "曲がり"}
-</button>
                 </button>
-
-                <button
+<button type="button" onClick={() => {}} style={inputStyle}>方向</button>
+<button type="button" onClick={() => {}} style={inputStyle}>傾斜</button>
+<button type="button" onClick={() => {}} style={inputStyle}>曲がり</button>            <button
                   type="button"
                   onClick={() => setEventModalPlayer(activePlayerIndex)}
+
+
                   style={{
                     ...inputStyle,
                     padding: "12px 10px",
