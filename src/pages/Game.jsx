@@ -865,14 +865,19 @@ firstPuttBreak: "",
                   {currentRow.putt !== "" ? `P:${currentRow.putt}` : "パット"}
 <button
   type="button"
-  onClick={() => updateHole("teeDirection", "↑")}
+  onClick={() =>
+    updateRow(activePlayerIndex, "teeDirection", "↑")
+  }
   style={inputStyle}
 >
   {currentRow.teeDirection || "方向"}
 </button>
+
 <button
   type="button"
-  onClick={() => updateHole("firstPuttSlope", "上り")}
+  onClick={() =>
+    updateRow(activePlayerIndex, "firstPuttSlope", "上り")
+  }
   style={inputStyle}
 >
   {currentRow.firstPuttSlope || "傾斜"}
@@ -880,7 +885,9 @@ firstPuttBreak: "",
 
 <button
   type="button"
-  onClick={() => updateHole("firstPuttBreak", "スライス")}
+  onClick={() =>
+    updateRow(activePlayerIndex, "firstPuttBreak", "スライス")
+  }
   style={inputStyle}
 >
   {currentRow.firstPuttBreak || "曲がり"}
