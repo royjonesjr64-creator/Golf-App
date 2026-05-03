@@ -242,8 +242,17 @@ export default function Result() {
       events,
       ranking: playerSummaries
     };
+const totalScore = rounds.reduce((sum, r) => sum + (Number(r.score) || 0), 0);
+const totalPutt = rounds.reduce((sum, r) => sum + (Number(r.putt) || 0), 0);
+const total100 = rounds.reduce((sum, r) => sum + (Number(r.inside100) || 0), 0);
+    const newDataWithTotal = {
+  ...newData,
+  totalScore,
+  totalPutt,
+  total100,
+};
 
-    const updated = [newData, ...saved];
+const updated = [newDataWithTotal, ...saved];
     localStorage.setItem("rounds", JSON.stringify(updated));
 
     nav("/history");
