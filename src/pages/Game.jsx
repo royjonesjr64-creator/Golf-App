@@ -1540,8 +1540,16 @@ color: currentRow.firstPuttBreak ? "#fff" : "#64748b"
           key={option}
           type="button"
           onClick={() => {
-            updateRow(detailModal.player, detailModal.key, option);
-            setDetailModal(null);
+  const current = rows[detailModal.player]?.[detailModal.key];
+
+  updateRow(
+    detailModal.player,
+    detailModal.key,
+    current === option ? "" : option
+  );
+
+
+setDetailModal(null);
           }}
           style={{ ...inputStyle, marginBottom: 8, width: "100%" }}
         >
