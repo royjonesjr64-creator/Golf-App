@@ -717,7 +717,13 @@ firstPuttBreak: "",
 
   <div style={{ display: "flex", gap: 8 }}>
     <button
-      onClick={() => updateRow(activePlayerIndex, "firstPuttDirection", "↑")}
+     onClick={() =>
+  setDetailModal({
+    player: activePlayerIndex,
+    key: "firstPuttDirection",
+    options: ["←", "↖", "↑", "↗", "→"]
+  })
+}
       style={{
         flex: 1,
         padding: 10,
@@ -730,7 +736,13 @@ firstPuttBreak: "",
     </button>
 
     <button
-      onClick={() => updateRow(activePlayerIndex, "firstPuttSlope", "上り")}
+      onClick={() =>
+  setDetailModal({
+    player: activePlayerIndex,
+    key: "firstPuttSlope",
+    options: ["上り", "下り", "平坦"]
+  })
+}
       style={{
         flex: 1,
         padding: 10,
@@ -743,7 +755,13 @@ firstPuttBreak: "",
     </button>
 
     <button
-     onClick={() => updateRow(activePlayerIndex, "firstPuttBreak", "スライス")}
+     onClick={() =>
+  setDetailModal({
+    player: activePlayerIndex,
+    key: "firstPuttBreak",
+    options: ["スライス", "フック", "まっすぐ"]
+  })
+}
       style={{
         flex: 1,
         padding: 10,
@@ -1489,6 +1507,46 @@ firstPuttBreak: "",
           </div>
         </div>
       )}
+{detailModal && (
+  <div
+    onClick={() => setDetailModal(null)}
+    style={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: "rgba(0,0,0,0.3)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 999
+    }}
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        background: "#fff",
+        padding: 20,
+        borderRadius: 12,
+        minWidth: 200
+      }}
+    >
+     {detailModal?.options?.map((option) => (
+        <button
+          key={option}
+          type="button"
+          onClick={() => {
+            updateRow(detailModal.player, detailModal.key, option);
+            setDetailModal(null);
+          }}
+          style={{ ...inputStyle, marginBottom: 8, width: "100%" }}
+        >
+          {option}
+        </button>
+      ))}
     </div>
+  </div>
+)}    </div>
   );
 }
