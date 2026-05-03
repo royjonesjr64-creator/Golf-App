@@ -725,12 +725,13 @@ firstPuttBreak: "",
   })
 }
       style={{
-        flex: 1,
-        padding: 10,
-        borderRadius: 10,
-        border: "1px solid #ccc",
-        background: currentRow.firstPuttDirection ? "#dcfce7" : "#fff"
-      }}
+  flex: 1,
+  padding: 10,
+  borderRadius: 10,
+  border: "1px solid #ccc",
+ background: currentRow.firstPuttDirection ? "#0f172a" : "#fff",
+color: currentRow.firstPuttDirection ? "#fff" : "#64748b"
+}}
     >
       方向
     </button>
@@ -743,13 +744,14 @@ firstPuttBreak: "",
     options: ["上り", "下り", "平坦"]
   })
 }
-      style={{
-        flex: 1,
-        padding: 10,
-        borderRadius: 10,
-        border: "1px solid #ccc",
-        background: currentRow.firstPuttSlope ? "#dcfce7" : "#fff"
-      }}
+     style={{
+  flex: 1,
+  padding: 10,
+  borderRadius: 10,
+  border: "1px solid #ccc",
+  background: currentRow.firstPuttSlope ? "#0f172a" : "#fff",
+color: currentRow.firstPuttSlope ? "#fff" : "#64748b"
+}}
     >
       傾斜
     </button>
@@ -762,13 +764,14 @@ firstPuttBreak: "",
     options: ["スライス", "フック", "まっすぐ"]
   })
 }
-      style={{
-        flex: 1,
-        padding: 10,
-        borderRadius: 10,
-        border: "1px solid #ccc",
-        background: currentRow.firstPuttBreak ? "#dcfce7" : "#fff"
-      }}
+     style={{
+  flex: 1,
+  padding: 10,
+  borderRadius: 10,
+  border: "1px solid #ccc",
+ background: currentRow.firstPuttBreak ? "#0f172a" : "#fff",
+color: currentRow.firstPuttBreak ? "#fff" : "#64748b"
+}}
     >
       曲がり
     </button>
