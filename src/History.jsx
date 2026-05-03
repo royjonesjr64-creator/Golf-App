@@ -223,16 +223,19 @@ export default function History() {
 
                     <div style={{ display: "grid", gap: 10 }}>
                       {item.ranking.map((player, i) => (
-                       <div
+                      <div
   key={`${item.id}-${player.playerName}-${i}`}
   style={{
-    background: "#fff",
-    borderRadius: 16,
-    padding: 16,
-    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
     display: "flex",
-    flexDirection: "column",
-    gap: 10
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 10,
+    padding: "18px 16px", // 
+    borderRadius: 14,
+    boxShadow: "0 4px 12px rgba(0,0,0,0.08)", // 
+    cursor: "pointer", // 
+    background: "#ffffff" // 
   }}
 >
   {/* 上段 */}
@@ -248,11 +251,37 @@ export default function History() {
   
 
   {/* 中段 */}
-  <div style={{ display: "flex", gap: 12, fontSize: 13 }}>
-    <div>差: {player.diff ?? "-"}</div>
-    <div>OP: {player.totalOlympic ?? "-"}</div>
+ <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+  
+  {/* 差 */}
+  <div
+    style={{
+      background: "#f0fdf4",
+      color: player.diff < 0 ? "#16a34a" : "#dc2626",
+      padding: "4px 10px",
+      borderRadius: 999,
+      fontSize: 12,
+      fontWeight: 600,
+    }}
+  >
+    差 {player.diff ?? "-"}
   </div>
 
+  {/* OP */}
+  <div
+    style={{
+      background: "#eff6ff",
+      color: "#2563eb",
+      padding: "4px 10px",
+      borderRadius: 999,
+      fontSize: 12,
+      fontWeight: 600,
+    }}
+  >
+    OP {player.totalOlympic ?? "-"}
+  </div>
+
+</div>
   {/* 下段 */}
   <div style={{ fontSize: 12, color: "#64748b" }}>
     {item.date?.split(" ")[0]} / {item.courseName || "未設定"}
