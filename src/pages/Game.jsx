@@ -55,6 +55,7 @@ export default function Game() {
   const [inside100ModalPlayer, setInside100ModalPlayer] = useState(null);
   const [puttModalPlayer, setPuttModalPlayer] = useState(null);
   const [eventModalPlayer, setEventModalPlayer] = useState(null);
+　const [detailModal, setDetailModal] = useState(null);
   const [driveModalPlayer, setDriveModalPlayer] = useState(null);
 
   const currentPar = Number(pars[hole - 1]) || 4;
