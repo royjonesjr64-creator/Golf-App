@@ -907,9 +907,7 @@ firstPuttBreak: "",
                 >
                   {currentRow.putt !== "" ? `P:${currentRow.putt}` : "パット"}
                 </button>
-<button type="button" onClick={() => {}} style={inputStyle}>方向</button>
-<button type="button" onClick={() => {}} style={inputStyle}>傾斜</button>
-<button type="button" onClick={() => {}} style={inputStyle}>曲がり</button>            <button
+<button
                   type="button"
                   onClick={() => setEventModalPlayer(activePlayerIndex)}
 
