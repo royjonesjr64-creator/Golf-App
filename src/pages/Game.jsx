@@ -716,7 +716,7 @@ firstPuttBreak: "",
 
   <div style={{ display: "flex", gap: 8 }}>
     <button
-      onClick={() => updateHole("firstPuttDirection", "↑")}
+      onClick={() => updateRow(activePlayerIndex, "firstPuttDirection", "↑")}
       style={{
         flex: 1,
         padding: 10,
@@ -729,7 +729,7 @@ firstPuttBreak: "",
     </button>
 
     <button
-      onClick={() => updateHole("firstPuttSlope", "上り")}
+      onClick={() => updateRow(activePlayerIndex, "firstPuttSlope", "上り")}
       style={{
         flex: 1,
         padding: 10,
@@ -742,7 +742,7 @@ firstPuttBreak: "",
     </button>
 
     <button
-      onClick={() => updateHole("firstPuttBreak", "スライス")}
+     onClick={() => updateRow(activePlayerIndex, "firstPuttBreak", "スライス")}
       style={{
         flex: 1,
         padding: 10,
