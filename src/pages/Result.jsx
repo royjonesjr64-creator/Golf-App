@@ -244,7 +244,7 @@ export default function Result() {
     };
 
     const updated = [newData, ...saved];
-    localStorage.setItem("history", JSON.stringify(updated));
+    localStorage.setItem("rounds", JSON.stringify(updated));
 
     nav("/history");
   };

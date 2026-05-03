@@ -730,10 +730,9 @@ firstPuttBreak: "",
   borderRadius: 10,
   border: "1px solid #ccc",
  background: currentRow.firstPuttDirection ? "#0f172a" : "#fff",
-color: currentRow.firstPuttDirection ? "#fff" : "#64748b"
-}}
+color: currentRow?.firstPuttDirection ? "#fff" : "#1e293b"}}
     >
-      方向
+    {currentRow?.firstPuttDirection || "方向"}
     </button>
 
     <button
@@ -750,10 +749,9 @@ color: currentRow.firstPuttDirection ? "#fff" : "#64748b"
   borderRadius: 10,
   border: "1px solid #ccc",
   background: currentRow.firstPuttSlope ? "#0f172a" : "#fff",
-color: currentRow.firstPuttSlope ? "#fff" : "#64748b"
-}}
+color: currentRow?.firstPuttDirection ? "#fff" : "#1e293b"}}
     >
-      傾斜
+      {currentRow?.firstPuttSlope || "傾斜"}
     </button>
 
     <button
@@ -770,10 +768,10 @@ color: currentRow.firstPuttSlope ? "#fff" : "#64748b"
   borderRadius: 10,
   border: "1px solid #ccc",
  background: currentRow.firstPuttBreak ? "#0f172a" : "#fff",
-color: currentRow.firstPuttBreak ? "#fff" : "#64748b"
+color: currentRow?.firstPuttDirection ? "#fff" : "#1e293b"
 }}
     >
-      曲がり
+     {currentRow?.firstPuttBreak || "曲がり"}
     </button>
   </div>
 </div>
