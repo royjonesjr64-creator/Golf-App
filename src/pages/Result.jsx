@@ -403,24 +403,10 @@ const updated = [newDataWithTotal, ...saved];
                         color: "#0f172a"
                       }}
                     >
-                      {player.totalScore}打
+                     {player.totalScore || "-"}打
                     </div>
 
-                    <div
-                      style={{
-                        padding: "6px 12px",
-                        borderRadius: 999,
-                        background: player.diff <= 0 ? "#f0fdf4" : "#fef2f2",
-                        border: `1px solid ${
-                          player.diff <= 0 ? "#bbf7d0" : "#fecaca"
-                        }`,
-                        fontWeight: 900,
-                        color: player.diff <= 0 ? "#15803d" : "#dc2626"
-                      }}
-                    >
-                      {player.diff > 0 ? `+${player.diff}` : player.diff}
-                    </div>
-
+                    
                     <StatChip
                       label="平均Driver"
                       value={
