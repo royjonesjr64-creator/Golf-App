@@ -244,9 +244,15 @@ export default function History() {
     {i + 1}. {player.playerName}
   </div>
 
-  <div style={{ color: "#0f172a", fontWeight: 800, fontSize: 20 }}>
-    {player.totalScore || "-"}打
-  </div>
+<div
+  style={{
+    fontSize: 26,
+    fontWeight: 800,
+    color: "#0f172a",
+  }}
+>
+  {player.totalScore || "-"}打
+</div>
 </div>
   
 
@@ -254,18 +260,18 @@ export default function History() {
  <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
   
   {/* 差 */}
-  <div
-    style={{
-      background: "#f0fdf4",
-      color: player.diff < 0 ? "#16a34a" : "#dc2626",
-      padding: "4px 10px",
-      borderRadius: 999,
-      fontSize: 12,
-      fontWeight: 600,
-    }}
-  >
-    差 {player.diff ?? "-"}
-  </div>
+ <div
+  style={{
+    background: "#f0fdf4",
+    color: player.diff < 0 ? "#16a34a" : "#dc2626",
+    padding: "4px 10px",
+    borderRadius: 999,
+    fontSize: 12,
+    fontWeight: 600,
+  }}
+>
+  差 {player.diff ?? "-"}
+</div>
 
   {/* OP */}
   <div
