@@ -713,27 +713,40 @@ firstPuttBreak: "",
                 </button>
               </div>
 <div style={{ marginTop: 10 }}>
-  <div style={{ fontSize: 12, marginBottom: 6 }}>パット</div>
+  <div style={{ fontSize: 12, marginBottom: 6 }}>1打目方向</div>
 
   <div style={{ display: "flex", gap: 8 }}>
-    <button
-     onClick={() =>
-  setDetailModal({
-    player: activePlayerIndex,
-    key: "firstPuttDirection",
-    options: ["←", "↖", "↑", "↗", "→"]
-  })
-}
-      style={{
-  flex: 1,
-  padding: 10,
-  borderRadius: 10,
-  border: "1px solid #ccc",
- background: currentRow.firstPuttDirection ? "#0f172a" : "#fff",
-color: currentRow?.firstPuttDirection ? "#fff" : "#1e293b"}}
-    >
-    {currentRow?.firstPuttDirection || "方向"}
-    </button>
+   <button
+  onClick={() =>
+    setDetailModal({
+      player: activePlayerIndex,
+      key: "firstPuttDirection",
+      options: ["←", "↑", "→"],
+    })
+  }
+  style={{
+    flex: 1,
+    padding: "16px 0",
+    fontSize: 18,
+    fontWeight: 700,
+    borderRadius: 10,
+    border: "1px solid #ccc",
+    background:
+      currentRow?.firstPuttDirection === "←"
+        ? "#fee2e2"
+        : currentRow?.firstPuttDirection === "↑"
+        ? "#dcfce7"
+        : currentRow?.firstPuttDirection === "→"
+        ? "#dbeafe"
+        : "#fff",
+    color:
+      currentRow?.firstPuttDirection
+        ? "#fff"
+        : "#1e293b",
+  }}
+>
+  {currentRow?.firstPuttDirection || "方向選択"}
+</button>
 
     <button
       onClick={() =>

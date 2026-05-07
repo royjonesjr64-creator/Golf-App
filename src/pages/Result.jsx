@@ -237,7 +237,10 @@ export default function Result() {
       courseName,
       playDate,
       players,
-      rounds,
+     rounds: rounds.map(r => ({
+  ...r,
+  firstPuttDirection: r.firstPuttDirection || "-"
+})),
       pars,
       events,
       ranking: playerSummaries
