@@ -14,7 +14,7 @@ export default function Game() {
       )
     : [];
 
-  const savedEvents = JSON.parse(localStorage.getItem("events") || "[]");
+  const savedEvents = JSON.parse(localStorage.getItem("olympicEvents")|| "[]");
  const activeEvents = Array.isArray(savedEvents)
   ? savedEvents.filter((e) => e)
   : [];
