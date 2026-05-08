@@ -16,9 +16,7 @@ export default function Game() {
 
   const savedEvents = JSON.parse(localStorage.getItem("events") || "[]");
  const activeEvents = Array.isArray(savedEvents)
-  ? savedEvents.filter(
-      (e) => e && (e.active || e.enabled || e.isActive)
-    )
+  ? savedEvents.filter((e) => e)
   : [];
 
   const defaultClubs = [
