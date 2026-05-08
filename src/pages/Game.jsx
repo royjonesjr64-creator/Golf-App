@@ -1455,24 +1455,20 @@ color: currentRow?.firstPuttDirection ? "#fff" : "#1e293b"
                 </div>
               ) : (
                 activeEvents.map((event) => (
-                <button
-  key={event.key}
+               <button
+  key={event.key || event.label}
   type="button"
   onClick={() => {
-    const current =
-      rows[eventModalPlayer]?.eventChecks || {};
+    const key = event.key || event.label;
+    const current = rows[eventModalPlayer]?.eventChecks || {};
 
-    updateRow(
-      eventModalPlayer,
-      "eventChecks",
-      {
-        ...current,
-        [event.key]: !current[event.key]
-      }
-    );
+    updateRow(eventModalPlayer, "eventChecks", {
+      ...current,
+      [key]: !current[key],
+    });
   }}
   style={eventButtonStyle(
-    !!rows[eventModalPlayer]?.eventChecks?.[event.key]
+    !!rows[eventModalPlayer]?.eventChecks?.[event.key || event.label]
   )}
 >
   <span
@@ -1480,7 +1476,7 @@ color: currentRow?.firstPuttDirection ? "#fff" : "#1e293b"
       flex: 1,
       minWidth: 0,
       whiteSpace: "normal",
-      overflowWrap: "break-word"
+      overflowWrap: "break-word",
     }}
   >
     {event.label}
@@ -1489,7 +1485,7 @@ color: currentRow?.firstPuttDirection ? "#fff" : "#1e293b"
   <span
     style={{
       color: "#64748b",
-      flexShrink: 0
+      flexShrink: 0,
     }}
   >
     {event.point > 0 ? `+${event.point}` : event.point}
