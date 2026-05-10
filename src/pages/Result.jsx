@@ -92,7 +92,11 @@ export default function Result() {
   const rounds = rawRounds.filter((r) => r && r.players);
   const pars = JSON.parse(localStorage.getItem("pars") || "[]");
   const players = JSON.parse(localStorage.getItem("players") || "[]");
-  const events = JSON.parse(localStorage.getItem("events") || "[]");
+  const savedEvents = JSON.parse(localStorage.getItem("olympicEvents") || "[]");
+
+const events = Array.isArray(savedEvents)
+  ? savedEvents.filter((e) => e)
+  : [];
 
   const golfName =
     localStorage.getItem("golfName") ||
