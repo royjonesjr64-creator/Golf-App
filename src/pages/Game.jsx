@@ -732,17 +732,16 @@ firstPuttBreak: "",
     borderRadius: 10,
     border: "1px solid #ccc",
     background:
-      currentRow?.firstPuttDirection === "←"
-        ? "#fef2f2"
-        : currentRow?.firstPuttDirection === "↑"
-        ? "#f0fdf4"
-        : currentRow?.firstPuttDirection === "→"
-        ? "#eff6ff"
-        : "#fff",
-    color:
-      currentRow?.firstPuttDirection
-        ? "#111"
-        : "#1e293b",
+  currentRow?.firstPuttDirection === "←"
+    ? "#fecaca"
+    : currentRow?.firstPuttDirection === "↑"
+    ? "#bbf7d0"
+    : currentRow?.firstPuttDirection === "→"
+    ? "#bfdbfe"
+    : "#fff",
+
+color: "#111",
+fontWeight: currentRow?.firstPuttDirection ? 900 : 700,
   }}
 >
   {currentRow?.firstPuttDirection || "方向選択"}
