@@ -761,8 +761,8 @@ fontWeight: currentRow?.firstPuttDirection ? 900 : 700,
   borderRadius: 10,
   border: "1px solid #ccc",
   background: currentRow.firstPuttSlope ? "#0f172a" : "#fff",
-color: currentRow?.firstPuttDirection ? "#fff" : "#1e293b"}}
-    >
+color: "#111",
+fontWeight: currentRow?.firstPuttBreak ? 900 : 700,    >
       {currentRow?.firstPuttSlope || "傾斜"}
     </button>
 
@@ -780,7 +780,8 @@ color: currentRow?.firstPuttDirection ? "#fff" : "#1e293b"}}
   borderRadius: 10,
   border: "1px solid #ccc",
  background: currentRow.firstPuttBreak ? "#0f172a" : "#fff",
-color: currentRow?.firstPuttDirection ? "#fff" : "#1e293b"
+color: "#111",
+fontWeight: currentRow?.firstPuttBreak ? 900 : 700,
 }}
     >
      {currentRow?.firstPuttBreak || "曲がり"}
