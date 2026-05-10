@@ -733,15 +733,15 @@ firstPuttBreak: "",
     border: "1px solid #ccc",
     background:
       currentRow?.firstPuttDirection === "←"
-        ? "#fee2e2"
+        ? "#fef2f2"
         : currentRow?.firstPuttDirection === "↑"
-        ? "#dcfce7"
+        ? "#f0fdf4"
         : currentRow?.firstPuttDirection === "→"
-        ? "#dbeafe"
+        ? "#eff6ff"
         : "#fff",
     color:
       currentRow?.firstPuttDirection
-        ? "#fff"
+        ? "#111"
         : "#1e293b",
   }}
 >
