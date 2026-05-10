@@ -742,7 +742,7 @@ firstPuttBreak: "",
 
 color: "#111",
 fontWeight: currentRow?.firstPuttDirection ? 900 : 700,
-  }}
+ }}
 >
   {currentRow?.firstPuttDirection || "方向選択"}
 </button>
@@ -760,9 +760,11 @@ fontWeight: currentRow?.firstPuttDirection ? 900 : 700,
   padding: 10,
   borderRadius: 10,
   border: "1px solid #ccc",
- background: currentRow?.firstPuttSlope ? "#dbeafe" : "#fff",
+ background: currentRow?.firstPuttBreak ? "#bfdbfe" : "#fff",
 color: "#111",
-fontWeight: currentRow?.firstPuttSlope ? 900 : 700,  >
+fontWeight: currentRow?.firstPuttSlope ? 900 : 700,
+}}
+>
       <span style={{ color: "#111", fontWeight: 900 }}>
   {currentRow?.firstPuttSlope || "傾斜"}
 </span>
@@ -781,11 +783,11 @@ fontWeight: currentRow?.firstPuttSlope ? 900 : 700,  >
   padding: 10,
   borderRadius: 10,
   border: "1px solid #ccc",
- background: currentRow?.firstPuttSlope ? "#dbeafe" : "#fff",
+ background: currentRow?.firstPuttBreak ? "#bfdbfe" : "#fff",
 color: "#111",
 fontWeight: currentRow?.firstPuttSlope ? 900 : 700,
 }}
-    >
+>
      <span style={{ color: "#111", fontWeight: 900 }}>
   {currentRow?.firstPuttBreak || "曲がり"}
 </span>
