@@ -108,7 +108,10 @@ const events = Array.isArray(savedEvents)
   const calcOlympicPoint = (playerRow) => {
     let p = 0;
     events.forEach((e) => {
-      if (e.active && playerRow?.eventChecks?.[e.key]) {
+     const key = e.key || e.label;
+const isActive = e.active || e.enabled || e.isActive;
+
+if (isActive && playerRow?.eventChecks?.[key]) {
         p += Number(e.point) || 0;
       }
     });
@@ -116,14 +119,20 @@ const events = Array.isArray(savedEvents)
   };
 
   const getRoleText = (playerRow) => {
-    const labels = [];
-    events.forEach((e) => {
-      if (e.active && playerRow?.eventChecks?.[e.key]) {
-        labels.push(e.label);
-      }
-    });
-    return labels.length > 0 ? labels.join(" / ") : "-";
-  };
+  const labels = [];
+
+  events.forEach((e) => {
+    const key = e.key || e.label;
+    const isActive = e.active || e.enabled || e.isActive;
+
+    if (isActive && playerRow?.eventChecks?.[key]) {
+      labels.push(e.label);
+    }
+  });
+
+  return labels.length > 0 ? labels.join("、") : "-";
+};
+
 
   const playerSummaries = useMemo(() => {
     return players.map((playerName, playerIndex) => {
