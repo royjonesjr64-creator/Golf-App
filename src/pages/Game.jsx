@@ -712,98 +712,89 @@ firstPuttBreak: "",
                   Double
                 </button>
               </div>
-<div style={{ marginTop: 10 }}>
+<div style={{ marginTop: 10, marginBottom: 10 }}>
   <div style={{ fontSize: 12, marginBottom: 6, fontWeight: 700 }}>
-  ティーショット
-</div>
+    ティーショット
+  </div>
 
+  <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+    <button
+      onClick={() =>
+        setDetailModal({
+          player: activePlayerIndex,
+          key: "firstPuttDirection",
+          options: ["←", "↑", "→"],
+        })
+      }
+      style={{
+        flex: 1,
+        padding: "16px 0",
+        fontSize: 18,
+        borderRadius: 10,
+        border: "1px solid #ccc",
+        background:
+          currentRow?.firstPuttDirection === "←"
+            ? "#fecaca"
+            : currentRow?.firstPuttDirection === "↑"
+            ? "#bbf7d0"
+            : currentRow?.firstPuttDirection === "→"
+            ? "#bfdbfe"
+            : "#fff",
+        color: "#111",
+        fontWeight: currentRow?.firstPuttDirection ? 900 : 700,
+      }}
+    >
+      {currentRow?.firstPuttDirection || "方向選択"}
+    </button>
+  </div>
 
-
+  <div style={{ marginTop: 10, marginBottom: 4, fontWeight: 700 }}>
+    グリーン状況
+  </div>
 
   <div style={{ display: "flex", gap: 8 }}>
-   <button
-  onClick={() =>
-    setDetailModal({
-      player: activePlayerIndex,
-      key: "firstPuttDirection",
-      options: ["←", "↑", "→"],
-    })
-  }
-
-
-  style={{
-    flex: 1,
-    padding: "16px 0",
-    fontSize: 18,
-    fontWeight: 700,
-    borderRadius: 10,
-    border: "1px solid #ccc",
-    background:
-  currentRow?.firstPuttDirection === "←"
-    ? "#fecaca"
-    : currentRow?.firstPuttDirection === "↑"
-    ? "#bbf7d0"
-    : currentRow?.firstPuttDirection === "→"
-    ? "#bfdbfe"
-    : "#fff",
-
-color: "#111",
-fontWeight: currentRow?.firstPuttDirection ? 900 : 700,
- }}
->
-  {currentRow?.firstPuttDirection || "方向選択"}
-</button>
+    <button
+      onClick={() =>
+        setDetailModal({
+          player: activePlayerIndex,
+          key: "firstPuttSlope",
+          options: ["上り", "下り", "平坦"],
+        })
+      }
+      style={{
+        flex: 1,
+        padding: 10,
+        borderRadius: 10,
+        border: "1px solid #ccc",
+        background: currentRow?.firstPuttSlope ? "#bfdbfe" : "#fff",
+        color: "#111",
+        fontWeight: currentRow?.firstPuttSlope ? 900 : 700,
+      }}
+    >
+      {currentRow?.firstPuttSlope || "傾斜"}
+    </button>
 
     <button
       onClick={() =>
-  setDetailModal({
-    player: activePlayerIndex,
-    key: "firstPuttSlope",
-    options: ["上り", "下り", "平坦"]
-  })
-}
-     style={{
-  flex: 1,
-  padding: 10,
-  borderRadius: 10,
-  border: "1px solid #ccc",
-background: currentRow?.firstPuttSlope ? "#bfdbfe" : "#fff",
-color: "#111",
-fontWeight: currentRow?.firstPuttSlope ? 900 : 700,
-}}
->
-      <span style={{ color: "#111", fontWeight: 900 }}>
-  {currentRow?.firstPuttSlope || "傾斜"}
-</span>
-    </button>
-
-    <button
-     onClick={() =>
-  setDetailModal({
-    player: activePlayerIndex,
-    key: "firstPuttBreak",
-    options: ["スライス", "フック", "まっすぐ"]
-  })
-}
-     style={{
-  flex: 1,
-  padding: 10,
-  borderRadius: 10,
-  border: "1px solid #ccc",
- background: currentRow?.firstPuttBreak ? "#bfdbfe" : "#fff",
-color: "#111",
-fontWeight: currentRow?.firstPuttBreak ? 900 : 700,
-}}
->
-     <span style={{ color: "#111", fontWeight: 900 }}>
-  {currentRow?.firstPuttBreak || "曲がり"}
-</span>
+        setDetailModal({
+          player: activePlayerIndex,
+          key: "firstPuttBreak",
+          options: ["スライス", "フック", "まっすぐ"],
+        })
+      }
+      style={{
+        flex: 1,
+        padding: 10,
+        borderRadius: 10,
+        border: "1px solid #ccc",
+        background: currentRow?.firstPuttBreak ? "#bfdbfe" : "#fff",
+        color: "#111",
+        fontWeight: currentRow?.firstPuttBreak ? 900 : 700,
+      }}
+    >
+      {currentRow?.firstPuttBreak || "曲がり"}
     </button>
   </div>
-<div style={{ marginTop: 10, fontSize: 12, marginBottom: 4, fontWeight: 700 }}>
-  グリーン状況
-</div>
-
 </div>
               <div
                 style={{
@@ -1577,21 +1568,20 @@ fontWeight: currentRow?.firstPuttBreak ? 900 : 700,
         minWidth: 200
       }}
     >
-     {detailModal?.options?.map((option) => (
+      {detailModal?.options?.map((option) => (
         <button
           key={option}
           type="button"
           onClick={() => {
-  const current = rows[detailModal.player]?.[detailModal.key];
+            const current = rows[detailModal.player]?.[detailModal.key];
 
-  updateRow(
-    detailModal.player,
-    detailModal.key,
-    current === option ? "" : option
-  );
+            updateRow(
+              detailModal.player,
+              detailModal.key,
+              current === option ? "" : option
+            );
 
-
-setDetailModal(null);
+            setDetailModal(null);
           }}
           style={{ ...inputStyle, marginBottom: 8, width: "100%" }}
         >
@@ -1599,7 +1589,8 @@ setDetailModal(null);
         </button>
       ))}
     </div>
+   </div>
+)}
   </div>
-)}    </div>
-  );
+);
 }
