@@ -256,7 +256,7 @@ const total100 = rounds.reduce((sum, r) => sum + (Number(r.inside100) || 0), 0);
 };
 
 const updated = [newDataWithTotal, ...saved];
-    localStorage.setItem("rounds", JSON.stringify(updated));
+  localStorage.setItem("golf_history", JSON.stringify(updated));
 
     nav("/history");
   };
