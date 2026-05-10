@@ -760,10 +760,12 @@ fontWeight: currentRow?.firstPuttDirection ? 900 : 700,
   padding: 10,
   borderRadius: 10,
   border: "1px solid #ccc",
-  background: currentRow.firstPuttSlope ? "#0f172a" : "#fff",
+ background: currentRow?.firstPuttSlope ? "#bbf7d0" : "#fff",
 color: "#111",
-fontWeight: currentRow?.firstPuttBreak ? 900 : 700,    >
-      {currentRow?.firstPuttSlope || "傾斜"}
+fontWeight: currentRow?.firstPuttSlope ? 900 : 700,   >
+      <span style={{ color: "#111", fontWeight: 900 }}>
+  {currentRow?.firstPuttSlope || "傾斜"}
+</span>
     </button>
 
     <button
@@ -784,7 +786,9 @@ color: "#111",
 fontWeight: currentRow?.firstPuttBreak ? 900 : 700,
 }}
     >
-     {currentRow?.firstPuttBreak || "曲がり"}
+     <span style={{ color: "#111", fontWeight: 900 }}>
+  {currentRow?.firstPuttBreak || "曲がり"}
+</span>
     </button>
   </div>
 </div>
