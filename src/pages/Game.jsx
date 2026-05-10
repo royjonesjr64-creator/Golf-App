@@ -713,7 +713,9 @@ firstPuttBreak: "",
                 </button>
               </div>
 <div style={{ marginTop: 10 }}>
-  <div style={{ fontSize: 12, marginBottom: 6 }}>1打目方向</div>
+  <div style={{ fontSize: 12, marginBottom: 6, fontWeight: 700 }}>
+  ティーショット
+</div>
 
 
 <div style={{ marginTop: 4, marginBottom: 4, fontSize: 12 }}>
