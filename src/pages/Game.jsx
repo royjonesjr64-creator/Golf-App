@@ -714,9 +714,7 @@ firstPuttBreak: "",
               </div>
 <div style={{ marginTop: 10 }}>
   <div style={{ fontSize: 12, marginBottom: 6 }}>1打目方向</div>
-<div style={{ marginTop: 10, marginBottom: 4, fontWeight: 700 }}>
-  グリーン状況
-</div>
+
 
 <div style={{ marginTop: 4, marginBottom: 4, fontSize: 12 }}>
   傾斜
@@ -754,7 +752,9 @@ fontWeight: currentRow?.firstPuttDirection ? 900 : 700,
 >
   {currentRow?.firstPuttDirection || "方向選択"}
 </button>
-
+<div style={{ marginTop: 10, marginBottom: 4, fontWeight: 700 }}>
+  グリーン状況
+</div>
     <button
       onClick={() =>
   setDetailModal({
