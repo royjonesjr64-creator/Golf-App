@@ -6,7 +6,7 @@ export default function History() {
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("history") || "[]");
+   const saved = JSON.parse(localStorage.getItem("golf_history") || "[]");
     setHistory(saved);
   }, []);
 
@@ -24,7 +24,7 @@ export default function History() {
   const deleteRound = (id) => {
     const updated = history.filter((item) => item.id !== id);
     setHistory(updated);
-    localStorage.setItem("history", JSON.stringify(updated));
+    localStorage.setItem("golf_history", JSON.stringify(updated));
   };
 
   return (
