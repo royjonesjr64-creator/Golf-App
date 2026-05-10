@@ -718,9 +718,6 @@ firstPuttBreak: "",
 </div>
 
 
-<div style={{ marginTop: 4, marginBottom: 4, fontSize: 12 }}>
-  傾斜
-</div>
 
 
   <div style={{ display: "flex", gap: 8 }}>
@@ -732,6 +729,8 @@ firstPuttBreak: "",
       options: ["←", "↑", "→"],
     })
   }
+
+
   style={{
     flex: 1,
     padding: "16px 0",
@@ -754,9 +753,7 @@ fontWeight: currentRow?.firstPuttDirection ? 900 : 700,
 >
   {currentRow?.firstPuttDirection || "方向選択"}
 </button>
-<div style={{ marginTop: 10, marginBottom: 4, fontWeight: 700 }}>
-  グリーン状況
-</div>
+
     <button
       onClick={() =>
   setDetailModal({
@@ -779,9 +776,7 @@ fontWeight: currentRow?.firstPuttSlope ? 900 : 700,
   {currentRow?.firstPuttSlope || "傾斜"}
 </span>
     </button>
-<div style={{ marginTop: 4, marginBottom: 4, fontSize: 12 }}>
-  曲がり
-</div>
+
     <button
      onClick={() =>
   setDetailModal({
@@ -805,6 +800,10 @@ fontWeight: currentRow?.firstPuttBreak ? 900 : 700,
 </span>
     </button>
   </div>
+<div style={{ marginTop: 10, fontSize: 12, marginBottom: 4, fontWeight: 700 }}>
+  グリーン状況
+</div>
+
 </div>
               <div
                 style={{
