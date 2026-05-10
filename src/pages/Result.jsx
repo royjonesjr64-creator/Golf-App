@@ -228,7 +228,7 @@ export default function Result() {
   };
 
   const handleSave = () => {
-    const saved = JSON.parse(localStorage.getItem("history") || "[]");
+   const saved = JSON.parse(localStorage.getItem("golf_history") || "[]");
 
     const newData = {
       id: Date.now(),
