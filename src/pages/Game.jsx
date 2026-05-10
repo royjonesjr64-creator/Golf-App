@@ -760,7 +760,7 @@ fontWeight: currentRow?.firstPuttDirection ? 900 : 700,
   padding: 10,
   borderRadius: 10,
   border: "1px solid #ccc",
- background: currentRow?.firstPuttBreak ? "#bfdbfe" : "#fff",
+background: currentRow?.firstPuttSlope ? "#bfdbfe" : "#fff",
 color: "#111",
 fontWeight: currentRow?.firstPuttSlope ? 900 : 700,
 }}
@@ -785,7 +785,7 @@ fontWeight: currentRow?.firstPuttSlope ? 900 : 700,
   border: "1px solid #ccc",
  background: currentRow?.firstPuttBreak ? "#bfdbfe" : "#fff",
 color: "#111",
-fontWeight: currentRow?.firstPuttSlope ? 900 : 700,
+fontWeight: currentRow?.firstPuttBreak ? 900 : 700,
 }}
 >
      <span style={{ color: "#111", fontWeight: 900 }}>
