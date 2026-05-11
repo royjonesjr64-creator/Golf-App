@@ -105,27 +105,27 @@ const events = Array.isArray(savedEvents)
   const courseName = localStorage.getItem("courseName") || "";
   const playDate = localStorage.getItem("playDate") || "";
 
-  const calcOlympicPoint = (playerRow) => {
-    let p = 0;
-    events.forEach((e) => {
-     const key = e.key || e.label;
-const isActive = e.active || e.enabled || e.isActive;
-
-if (isActive && playerRow?.eventChecks?.[key]) {
-        p += Number(e.point) || 0;
-      }
-    });
-    return p;
-  };
-
-  const getRoleText = (playerRow) => {
-  const labels = [];
-
+ const calcOlympicPoint = (playerRow) => {
+  let p = 0;
   events.forEach((e) => {
     const key = e.key || e.label;
     const isActive = e.active || e.enabled || e.isActive;
 
     if (isActive && playerRow?.eventChecks?.[key]) {
+      p += Number(e.point) || 0;
+    }
+  });
+  return p;
+};
+
+ const getRoleText = (playerRow) => {
+  const labels = [];
+
+  events.forEach((e) => {
+   const key = e.key || e.label;
+const isActive = e.active || e.enabled || e.isActive;
+
+if (isActive && playerRow?.eventChecks?.[key]) {
       labels.push(e.label);
     }
   });
