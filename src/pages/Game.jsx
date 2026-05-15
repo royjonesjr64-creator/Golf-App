@@ -855,14 +855,16 @@ firstPuttBreak: "",
                     : "距離"}
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => setClubModalPlayer(activePlayerIndex)}
+               <button
+  type="button"
+  disabled={activePlayerIndex !== 0}
+  onClick={() => setClubModalPlayer(activePlayerIndex)}
                   style={{
                     ...inputStyle,
                     padding: "12px 10px",
                     textAlign: "center",
                     cursor: "pointer",
+opacity: activePlayerIndex !== 0 ? 0.5 : 1,
                     fontSize: 14,
                     color: currentRow.club ? "#0f172a" : "#64748b"
                   }}
@@ -870,8 +872,9 @@ firstPuttBreak: "",
                   {currentRow.club || "クラブ"}
                 </button>
 
-                <button
-                  type="button"
+               <button
+  type="button"
+  disabled={activePlayerIndex !== 0}
                   onClick={() =>
                     updateRow(
                       activePlayerIndex,
@@ -884,6 +887,7 @@ firstPuttBreak: "",
                     padding: "12px 10px",
                     textAlign: "center",
                     cursor: "pointer",
+opacity: activePlayerIndex !== 0 ? 0.5 : 1,
                     fontSize: 14,
                     background:
                       currentRow.fairwayKeep === "keep" ? "#dcfce7" : "#ffffff",
@@ -918,6 +922,9 @@ firstPuttBreak: "",
               >
                 <button
                   type="button"
+  type="button"
+  disabled={activePlayerIndex !== 0}
+  onClick={() => setInside100ModalPlayer(activePlayerIndex)}
                   onClick={() => setInside100ModalPlayer(activePlayerIndex)}
                   style={{
                     ...inputStyle,
@@ -933,16 +940,17 @@ firstPuttBreak: "",
                     ? `100Y:${currentRow.inside100}`
                     : "100Y"}
                 </button>
-
-                <button
-                  type="button"
-                  onClick={() => setPuttModalPlayer(activePlayerIndex)}
+<button
+  type="button"
+  disabled={activePlayerIndex !== 0}
+  onClick={() => setPuttModalPlayer(activePlayerIndex)}
                   style={{
-                    ...inputStyle,
-                    padding: "12px 10px",
-                    textAlign: "center",
-                    cursor: "pointer",
-                    fontSize: 14,
+  ...inputStyle,
+  padding: "12px 10px",
+  textAlign: "center",
+  cursor: "pointer",
+  opacity: activePlayerIndex !== 0 ? 0.5 : 1,
+  fontSize: 14,
                     color: currentRow.putt !== "" ? "#0f172a" : "#64748b"
                   }}
                 >
@@ -958,6 +966,7 @@ firstPuttBreak: "",
                     padding: "12px 10px",
                     textAlign: "center",
                     cursor: "pointer",
+opacity: activePlayerIndex !== 0 ? 0.5 : 1,
                     fontSize: 14,
                     color:
                       selectedEventLabels(activePlayerIndex).length > 0
