@@ -73,6 +73,7 @@ export default function Game() {
 teeDirection: "",
 firstPuttSlope: "",
 firstPuttBreak: "",
+penalty: "",
     }),
     []
   );
@@ -340,6 +341,7 @@ firstPuttBreak: "",
         fairwayKeep: row.fairwayKeep || "",
         club: row.club || "",
         putt: Number(row.putt) || 0,
+penalty: row.penalty || "",
         eventChecks: row.eventChecks || {}
       }))
     };
@@ -794,6 +796,7 @@ firstPuttBreak: "",
     >
       {currentRow?.firstPuttBreak || "曲がり"}
     </button>
+
   </div>
 </div>
               <div
@@ -837,6 +840,29 @@ firstPuttBreak: "",
                   marginBottom: 10
                 }}
               >
+<button
+  type="button"
+  disabled={activePlayerIndex !== 0}
+  onClick={() =>
+    setDetailModal({
+      player: activePlayerIndex,
+      key: "penalty",
+      options: ["なし", "OB", "1P", "LOST"],
+    })
+  }
+  style={{
+    ...inputStyle,
+    padding: "12px 10px",
+    textAlign: "center",
+    cursor: "pointer",
+    opacity: activePlayerIndex !== 0 ? 0.5 : 1,
+    fontSize: 14,
+    color: currentRow.penalty ? "#dc2626" : "#64748b",
+    fontWeight: "bold",
+  }}
+>
+  {currentRow.penalty || "ペナ"}
+</button>
                 <button
                   type="button"
                   onClick={() => setDriveModalPlayer(activePlayerIndex)}
@@ -910,12 +936,13 @@ opacity: activePlayerIndex !== 0 ? 0.5 : 1,
                       ? "FW○"
                       : "FW"}
                 </button>
+
               </div>
 
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                  gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
                   gap: 8,
                   marginBottom: 10
                 }}
