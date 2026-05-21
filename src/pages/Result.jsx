@@ -609,8 +609,10 @@ const updated = [newDataWithTotal, ...saved];
 <MiniBox
   label="100Y以上ON"
   value={
-  r.greenOnDistance
-    ? `${r.greenOnDistance}Y / ${r.score}打`
+  r.greenOnDistance !== undefined &&
+  r.greenOnDistance !== null &&
+  r.greenOnDistance !== ""
+    ? `${r.greenOnDistance}Y`
     : "-"
 }
 />
