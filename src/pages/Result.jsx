@@ -166,7 +166,10 @@ if (isActive && playerRow?.eventChecks?.[key]) {
       const totalPar = playerRounds.reduce((sum, r) => sum + r.par, 0);
       const totalOlympic = playerRounds.reduce((sum, r) => sum + r.olympicPoint, 0);
 const totalPutt = playerRounds.reduce((sum, r) => sum + r.putt, 0);
-const totalInside100 = playerRounds.reduce((sum, r) => sum + r.inside100, 0);
+const totalInside100 = playerRounds.reduce(
+  (sum, r) => sum + (r.inside100 === 1 || r.greenOnDistance > 0 ? 1 : 0),
+  0
+);
 
 const avgPutt =
   playerRounds.length > 0
