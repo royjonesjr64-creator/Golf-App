@@ -608,12 +608,11 @@ const updated = [newDataWithTotal, ...saved];
         >
 <MiniBox
   label="100Y以上ON"
-  value={
-  r.greenOnDistance !== undefined &&
-  r.greenOnDistance !== null &&
-  r.greenOnDistance !== ""
-    ? `${r.greenOnDistance}Y`
-    : "-"
+ value={
+  <div>
+    <div>{r.greenOnDistance}Y ON</div>
+    <div>100Y以内 {r.inside100}打</div>
+  </div>
 }
 />
           <MiniBox label="役" value={r.roleText} />
