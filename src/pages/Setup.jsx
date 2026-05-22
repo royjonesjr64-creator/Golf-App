@@ -7,12 +7,15 @@ export default function Setup() {
   const [players, setPlayers] = useState(
     JSON.parse(localStorage.getItem("players") || '[""]')
   );
+const courses =
+  JSON.parse(localStorage.getItem("courses") || "[]");
   const [golfName, setGolfName] = useState(
     localStorage.getItem("golfName") || ""
   );
   const [courseName, setCourseName] = useState(
     localStorage.getItem("courseName") || ""
   );
+const [selectedCourse, setSelectedCourse] = useState("");
   const [playDate, setPlayDate] = useState(
     localStorage.getItem("playDate") || ""
   );
@@ -38,6 +41,27 @@ export default function Setup() {
     localStorage.setItem("players", JSON.stringify(cleanedPlayers));
     localStorage.setItem("golfName", golfName);
     localStorage.setItem("courseName", courseName);
+const selectedCourseData = courses.find(
+  (course) => course.name === selectedCourse
+);
+
+if (selectedCourseData) {
+  localStorage.setItem("golfName", selectedCourseData.name);
+
+  localStorage.setItem(
+    "courseName",
+    selectedCourseData.courseName || ""
+  );
+
+  localStorage.setItem(
+    "pars",
+    JSON.stringify(
+      selectedCourseData.holes.map(
+        (h) => Number(h.par) || 4
+      )
+    )
+  );
+}
     localStorage.setItem("playDate", playDate);
     localStorage.removeItem("rounds");
 
@@ -72,6 +96,41 @@ export default function Setup() {
             marginBottom: 22
           }}
         >
+<select
+  value={selectedCourse}
+  onChange={(e) => setSelectedCourse(e.target.value)}
+  style={{
+    width: "100%",
+    padding: 12,
+    borderRadius: 12,
+    border: "1px solid #cbd5e1",
+    marginBottom: 12
+  }}
+>
+  <option value="">コース選択</option>
+
+  {courses.map((course, idx) => (
+    <option key={idx} value={course.name}>
+      {course.name}
+    </option>
+  ))}
+</select>
+<button
+  onClick={() => nav("/course-settings")}
+  style={{
+    width: "100%",
+    padding: 12,
+    borderRadius: 12,
+    border: "none",
+    background: "#0f172a",
+    color: "#fff",
+    fontWeight: "bold",
+    marginBottom: 16,
+    cursor: "pointer"
+  }}
+>
+  コース登録
+</button>
           <div style={{ fontSize: 14, opacity: 0.9 }}>ROUND SETUP</div>
           <h1 style={{ margin: "6px 0 0 0", fontSize: 38 }}>ラウンド設定</h1>
           <div style={{ marginTop: 8, fontSize: 16, fontWeight: 700 }}>

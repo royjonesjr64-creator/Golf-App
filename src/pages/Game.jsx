@@ -39,7 +39,8 @@ export default function Game() {
     JSON.parse(localStorage.getItem("clubs") || "null") || defaultClubs;
 
   const pars = JSON.parse(localStorage.getItem("pars") || "[]");
-
+const courses =
+  JSON.parse(localStorage.getItem("courses") || "[]");
   const getInitialHole = () => {
     const h = Number(searchParams.get("hole"));
     if (!Number.isFinite(h) || h < 1) return 1;
