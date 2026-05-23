@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { db } from "../firebase";
+import { collection, addDoc, getDocs } from "firebase/firestore";
 
 export default function CourseSettings() {
   const nav = useNavigate();
@@ -20,7 +22,7 @@ export default function CourseSettings() {
     setHoles(next);
   };
 
-  const saveCourse = () => {
+  const saveCourse = async () => {
     const saved = JSON.parse(localStorage.getItem("courses") || "[]");
 
     const newCourse = {
@@ -34,7 +36,7 @@ export default function CourseSettings() {
       }))
     };
 
-    localStorage.setItem("courses", JSON.stringify([newCourse, ...saved]));
+    await addDoc(collection(db, "courses"), newCourse);
     nav("/setup");
   };
 
