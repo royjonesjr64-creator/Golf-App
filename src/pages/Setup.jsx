@@ -60,8 +60,7 @@ const selectedCourseData = courses.find(
   (course) => course.name === selectedCourse
 );
 
-if (selectedCourseData) {
-  localStorage.setItem("golfName", selectedCourseData.name);
+if (selectedCourseData && Array.isArray(selectedCourseData.holes)) {  localStorage.setItem("golfName", selectedCourseData.name);
 
   localStorage.setItem(
     "courseName",
@@ -70,11 +69,11 @@ if (selectedCourseData) {
 
   localStorage.setItem(
     "pars",
-    JSON.stringify(
-      selectedCourseData.holes.map(
-        (h) => Number(h.par) || 4
-      )
-    )
+  JSON.stringify(
+  (selectedCourseData.holes || []).map(
+    (h) => Number(h.par) || 4
+  )
+)
   );
 }
     localStorage.setItem("playDate", playDate);
