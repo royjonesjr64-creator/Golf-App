@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebase";
 
 export default function Setup() {
   const nav = useNavigate();
@@ -7,8 +8,20 @@ export default function Setup() {
   const [players, setPlayers] = useState(
     JSON.parse(localStorage.getItem("players") || '[""]')
   );
-const courses =
-  JSON.parse(localStorage.getItem("courses") || "[]");
+const [courses, setCourses] = useState([]);
+
+useEffect(() => {
+  const loadCourses = async () => {
+    const snapshot = await getDocs(collection(db, "courses"));
+    const list = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    setCourses(list);
+  };
+
+  loadCourses();
+}, []);
   const [golfName, setGolfName] = useState(
     localStorage.getItem("golfName") || ""
   );
