@@ -151,11 +151,14 @@ if (exists) {
   }}
 />
         {courses
-  .filter((course) =>
-    `${course.name || ""} ${course.courseName || ""}`
-      .toLowerCase()
-      .includes(searchText.toLowerCase())
-  )
+  .filter((course) => {
+    const text = `${course.name || ""} ${course.courseName || ""}`.toLowerCase();
+    const keyword = searchText.toLowerCase().trim();
+
+    if (!keyword) return true;
+
+    return text.includes(keyword);
+  })
   .map((course) => (
           <div key={course.id} style={{ padding: 12, border: "1px solid #ddd", borderRadius: 10, marginBottom: 10, background: "#fff" }}>
            <div style={{ fontWeight: "bold" }}>
