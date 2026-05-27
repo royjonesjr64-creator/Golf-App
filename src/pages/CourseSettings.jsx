@@ -67,7 +67,6 @@ if (exists) {
   return;
 }
     const newCourse = {
-  id: Date.now(),
  userId: auth.currentUser?.uid || "guest",
   name,
   courseName,
