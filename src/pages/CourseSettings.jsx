@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebase";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDocs, deleteDoc, doc } from "firebase/firestore";
 
 export default function CourseSettings() {
   const nav = useNavigate();
 
   const [name, setName] = useState("");
   const [courseName, setCourseName] = useState("");
+  const [courses, setCourses] = useState([]);
+
   const [holes, setHoles] = useState(
     Array.from({ length: 18 }, (_, i) => ({
       hole: i + 1,
@@ -16,17 +18,51 @@ export default function CourseSettings() {
     }))
   );
 
+  useEffect(() => {
+    const loadCourses = async () => {
+      const snapshot = await getDocs(collection(db, "courses"));
+      const list = snapshot.docs.map((d) => ({
+        id: d.id,
+        ...d.data()
+      }));
+      setCourses(list);
+    };
+
+    loadCourses();
+  }, []);
+
   const updateHole = (index, key, value) => {
     const next = [...holes];
     next[index] = { ...next[index], [key]: value };
     setHoles(next);
   };
 
-  const saveCourse = async () => {
-    const saved = JSON.parse(localStorage.getItem("courses") || "[]");
+  const deleteCourse = async (id) => {
+  if (!window.confirm("削除する？")) return;
 
+  await deleteDoc(doc(db, "courses", id));
+
+  const snapshot = await getDocs(collection(db, "courses"));
+  const list = snapshot.docs.map((d) => ({
+    id: d.id,
+    ...d.data()
+  }));
+
+  setCourses(list);
+
+  alert("削除しました");
+};
+
+  const saveCourse = async () => {
+const exists = courses.some(
+  (c) => c.name === name && c.courseName === courseName
+);
+
+if (exists) {
+  alert("このコースはすでに登録されています");
+  return;
+}
     const newCourse = {
-      id: Date.now(),
       name,
       courseName,
       holes: holes.map((h) => ({
@@ -44,65 +80,38 @@ export default function CourseSettings() {
     <div style={{ padding: 16, background: "#f8fafc", minHeight: "100vh" }}>
       <h1>コース登録</h1>
 
-      <input
-        placeholder="ゴルフ場名"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        style={{ width: "100%", padding: 12, marginBottom: 10 }}
-      />
+      <input placeholder="ゴルフ場名" value={name} onChange={(e) => setName(e.target.value)} style={{ width: "100%", padding: 12, marginBottom: 10 }} />
 
-      <input
-        placeholder="コース名"
-        value={courseName}
-        onChange={(e) => setCourseName(e.target.value)}
-        style={{ width: "100%", padding: 12, marginBottom: 16 }}
-      />
+      <input placeholder="コース名" value={courseName} onChange={(e) => setCourseName(e.target.value)} style={{ width: "100%", padding: 12, marginBottom: 16 }} />
 
       <div style={{ display: "grid", gap: 8 }}>
         {holes.map((h, idx) => (
-          <div
-            key={h.hole}
-            style={{
-              display: "grid",
-              gridTemplateColumns: "50px 1fr 1fr",
-              gap: 8,
-              alignItems: "center"
-            }}
-          >
+          <div key={h.hole} style={{ display: "grid", gridTemplateColumns: "50px 1fr 1fr", gap: 8, alignItems: "center" }}>
             <strong>H{h.hole}</strong>
-
-            <input
-              placeholder="Par"
-              value={h.par}
-              onChange={(e) => updateHole(idx, "par", e.target.value)}
-              style={{ padding: 10 }}
-            />
-
-            <input
-              placeholder="距離"
-              value={h.distance}
-              onChange={(e) => updateHole(idx, "distance", e.target.value)}
-              style={{ padding: 10 }}
-            />
+            <input placeholder="Par" value={h.par} onChange={(e) => updateHole(idx, "par", e.target.value)} style={{ padding: 10 }} />
+            <input placeholder="距離" value={h.distance} onChange={(e) => updateHole(idx, "distance", e.target.value)} style={{ padding: 10 }} />
           </div>
         ))}
       </div>
 
-      <button
-        onClick={saveCourse}
-        style={{
-          marginTop: 20,
-          width: "100%",
-          padding: 14,
-          borderRadius: 12,
-          border: "none",
-          background: "#2563eb",
-          color: "#fff",
-          fontWeight: "bold"
-        }}
-      >
+      <button onClick={saveCourse} style={{ marginTop: 20, width: "100%", padding: 14, borderRadius: 12, border: "none", background: "#2563eb", color: "#fff", fontWeight: "bold" }}>
         保存する
       </button>
+
+      <div style={{ marginTop: 24 }}>
+        <h2>登録済みコース</h2>
+
+        {courses.map((course) => (
+          <div key={course.id} style={{ padding: 12, border: "1px solid #ddd", borderRadius: 10, marginBottom: 10, background: "#fff" }}>
+            <div style={{ fontWeight: "bold" }}>{course.name}</div>
+            <div>{course.courseName}</div>
+
+            <button onClick={() => deleteCourse(course.id)} style={{ marginTop: 8, padding: "8px 12px", border: "none", borderRadius: 8, background: "#dc2626", color: "#fff", cursor: "pointer" }}>
+              削除
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
