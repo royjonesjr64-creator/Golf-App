@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebase";
 import { collection, addDoc, getDocs, deleteDoc, doc } from "firebase/firestore";
-
+import { auth } from "../firebase";
+import {
+  GoogleAuthProvider,
+  signInWithPopup
+} from "firebase/auth";
 export default function CourseSettings() {
   const nav = useNavigate();
 
@@ -63,7 +67,8 @@ if (exists) {
   return;
 }
     const newCourse = {
-      name,
+      userId: auth.currentUser?.uid,
+name,
       courseName,
       holes: holes.map((h) => ({
         hole: h.hole,
@@ -76,8 +81,20 @@ if (exists) {
     nav("/setup");
   };
 
-  return (
+ return (
+  <>
+    <button
+      onClick={async () => {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+        alert("ログイン成功");
+      }}
+    >
+      Googleログイン
+    </button>
+
     <div style={{ padding: 16, background: "#f8fafc", minHeight: "100vh" }}>
+
       <h1>コース登録</h1>
 
       <input placeholder="ゴルフ場名" value={name} onChange={(e) => setName(e.target.value)} style={{ width: "100%", padding: 12, marginBottom: 10 }} />
@@ -113,5 +130,6 @@ if (exists) {
         ))}
       </div>
     </div>
+</>
   );
 }
