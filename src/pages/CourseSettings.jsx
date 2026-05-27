@@ -68,7 +68,7 @@ if (exists) {
 }
     const newCourse = {
   id: Date.now(),
-  userId: auth.currentUser?.uid,
+ userId: auth.currentUser?.uid || "guest",
   name,
   courseName,
   holes: holes.map((h) => ({
