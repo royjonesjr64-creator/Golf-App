@@ -1,7 +1,38 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase";
 
-export default function ParSettings() {
+const location = useLocation();
+const { selectedCourseId } = location.state || {};
+const [courseData, setCourseData] = useState(null);
+useEffect(() => {
+  const fetchCourse = async () => {
+    if (!selectedCourseId) return;
+
+    try {
+      const docRef = doc(db, "courses", selectedCourseId);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setCourseData(data);
+
+        // parが保存されてるなら反映
+       if (data.holes) {
+  const pars = data.holes.map((h) => String(h.par || 4));
+  setPars(pars);
+}
+      }
+    } catch (error) {
+      console.error("コース取得失敗:", error);
+    }
+  };
+
+  fetchCourse();
+}, [selectedCourseId]);
+export default function ParSettings(
+) {
   const nav = useNavigate();
   const holeCount = 18;
 
@@ -41,6 +72,7 @@ export default function ParSettings() {
 
   return (
     <div
+<div>選択コースID: {selectedCourseId || "なし"}</div>
       style={{
         minHeight: "100vh",
         background: "linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%)",
