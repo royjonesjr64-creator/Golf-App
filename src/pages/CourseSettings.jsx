@@ -77,6 +77,16 @@ const [searchText, setSearchText] = useState("");
 };
 
   const saveCourse = async () => {
+if (!name.trim()) {
+  alert("ゴルフ場名を入力してください");
+  return;
+}
+
+if (!courseName.trim()) {
+  alert("コース名を入力してください");
+  return;
+}
+
 const exists = courses.some(
   (c) => c.name === name && c.courseName === courseName
 );
