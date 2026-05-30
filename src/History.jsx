@@ -89,7 +89,21 @@ export default function History() {
               >
                 <InfoChip label="人数" value={item.players?.length || 0} />
                 <InfoChip label="ホール数" value={item.rounds?.length || 0} />
-                <InfoChip
+<InfoChip
+  label="スコア"
+  value={`${item.ranking?.[0]?.totalScore || "-"}打`}
+/>
+
+<InfoChip
+  label="100y"
+  value={`${item.rounds?.reduce((sum, r) => sum + (Number(r.shortGameCount) || 0), 0) || "-"}打`}
+/>
+
+<InfoChip
+  label="パット"
+  value={`${item.rounds?.reduce((sum, r) => sum + (Number(r.puttCount) || 0), 0) || "-"}打`}
+/>               
+ <InfoChip
                   label="保存日時"
                   value={item.date ? String(item.date).slice(0, 16) : "-"}
                 />

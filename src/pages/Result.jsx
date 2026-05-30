@@ -680,7 +680,9 @@ const updated = [newDataWithTotal, ...saved];
               const player = round.players?.[0];
               const inside100 = Number(player?.inside100 || 0);
               const putt = Number(player?.putt || 0);
-
+		const score = Number(player?.score || round.score || 0);
+		const par = Number(pars?.[idx] || 4);
+		const diff = score - par;
               return (
                 <div
                   key={idx}
@@ -691,11 +693,19 @@ const updated = [newDataWithTotal, ...saved];
                     border: "1px solid #ddd",
                   }}
                 >
-                  <div style={{ fontWeight: "bold", marginBottom: 6 }}>
-                    Hole {idx + 1}
-                  </div>
+                 <div style={{ fontWeight: "bold", marginBottom: 6 }}>
+  Hole {idx + 1}
+</div>
 
-                <div style={{ marginTop: 8 }}>
+<div style={{ fontSize: 24, fontWeight: 900, color: "#16a34a" }}>
+  {score || "-"}打
+</div>
+
+<div style={{ fontSize: 13, color: "#0f172a" }}>
+  {score ? `(${diff >= 0 ? "+" : ""}${diff})` : ""}
+</div>
+
+<div style={{ marginTop: 8 }}>
   <div
     style={{
       display: "flex",
