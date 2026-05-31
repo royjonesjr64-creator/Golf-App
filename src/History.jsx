@@ -104,6 +104,7 @@ export default function History() {
     </div>
   </div>
 )}
+
       {history.length === 0 ? (
         <div
           style={{
