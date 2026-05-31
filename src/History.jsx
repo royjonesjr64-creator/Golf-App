@@ -37,7 +37,73 @@ export default function History() {
       }}
     >
       <h1 style={{ marginBottom: 16 }}>ラウンド履歴</h1>
+{history.length > 0 && (
+  <div
+    style={{
+      background: "#ffffff",
+      border: "1px solid #e5e7eb",
+      borderRadius: 18,
+      padding: 18,
+      marginBottom: 18,
+      boxShadow: "0 6px 16px rgba(15,23,42,0.05)",
+    }}
+  >
+    <h2 style={{ margin: "0 0 14px" }}>スコア推移</h2>
 
+    <div style={{ display: "flex", alignItems: "end", gap: 10, height: 180 }}>
+      {history
+        .slice()
+        .reverse()
+        .map((item, index) => {
+          const score =
+            item.totalScore ||
+            item.ranking?.[0]?.totalScore ||
+            item.rounds?.reduce((sum, r) => sum + (Number(r.score) || 0), 0) ||
+            0;
+
+          const barHeight = score ? Math.max(20, score * 1.5) : 20;
+
+          return (
+            <div
+              key={item.id || index}
+              style={{
+                width: 60,
+                textAlign: "center",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "flex-end",
+              }}
+            >
+              <div style={{ fontWeight: 900, marginBottom: 6 }}>
+                {score || "-"}
+              </div>
+
+              <div
+                style={{
+                  width: "70%",
+                  height: barHeight,
+                  borderRadius: "10px 10px 0 0",
+                  background: "#16a34a",
+                }}
+              />
+
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "#64748b",
+                  marginTop: 6,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {(item.playDate || item.date || "").slice(5, 10)}
+              </div>
+            </div>
+          );
+        })}
+    </div>
+  </div>
+)}
       {history.length === 0 ? (
         <div
           style={{
@@ -67,13 +133,13 @@ export default function History() {
                 #{history.length - index}
               </div>
 
-              <h2 style={{ margin: "8px 0 4px" }}>
-                {item.golfName || "未設定"}
-              </h2>
+           <h2 style={{ margin: "8px 0 4px" }}>
+  {item.golfName || "ゴルフ場名なし"}
+</h2>
 
-              <div style={{ fontWeight: 700, marginBottom: 6 }}>
-                {item.courseName || "コース名なし"}
-              </div>
+<div style={{ fontWeight: 800, marginBottom: 6, color: "#2563eb" }}>
+  {item.courseName || "コース名なし"}
+</div>
 
               <div style={{ color: "#64748b", fontSize: 14 }}>
                 {item.playDate || item.date || "-"}
@@ -96,12 +162,12 @@ export default function History() {
 
 <InfoChip
   label="100y"
-  value={`${item.rounds?.reduce((sum, r) => sum + (Number(r.shortGameCount) || 0), 0) || "-"}打`}
+  value={`${item.rounds?.reduce((sum, r) => sum + (Number(r.inside100) || 0), 0) || "-"}打`}
 />
 
 <InfoChip
   label="パット"
-  value={`${item.rounds?.reduce((sum, r) => sum + (Number(r.puttCount) || 0), 0) || "-"}打`}
+  value={`${item.rounds?.reduce((sum, r) => sum + (Number(r.putt) || 0), 0) || "-"}打`}
 />               
  <InfoChip
                   label="保存日時"
