@@ -49,7 +49,51 @@ export default function History() {
   }}
 >
   <h2 style={{ margin: "0 0 12px" }}>コース別成績</h2>
+<div
+  style={{
+    background: "#ffffff",
+    border: "1px solid #e5e7eb",
+    borderRadius: 18,
+    padding: 16,
+    marginBottom: 16,
+  }}
+>
+  <h2 style={{ margin: "0 0 12px" }}>クラブ別平均飛距離</h2>
 
+  {Object.entries(
+    history.reduce((acc, item) => {
+      (item.rounds || []).forEach((r) => {
+        const club = r.club;
+        const distance = Number(r.driveDistance || r.distance || 0);
+
+        if (!club || !distance) return;
+
+        if (!acc[club]) {
+          acc[club] = { count: 0, total: 0 };
+        }
+
+        acc[club].count += 1;
+        acc[club].total += distance;
+      });
+
+      return acc;
+    }, {})
+  ).map(([club, data]) => (
+    <div
+      key={club}
+      style={{
+        padding: "10px 0",
+        borderBottom: "1px solid #f3f4f6",
+      }}
+    >
+      <div style={{ fontWeight: 700 }}>{club}</div>
+      <div style={{ fontSize: 14, color: "#64748b" }}>
+        平均: {Math.round(data.total / data.count)}y　
+        使用: {data.count}回
+      </div>
+    </div>
+  ))}
+</div>
   {Object.entries(
     history.reduce((acc, item) => {
       const course = item.courseName || "コース未設定";
