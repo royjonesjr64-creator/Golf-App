@@ -27,15 +27,17 @@ export default function History() {
     localStorage.setItem("golf_history", JSON.stringify(updated));
   };
 
-  return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#f8fafc",
-        padding: 16,
-        boxSizing: "border-box",
-      }}
-    >
+ return (
+  <div
+    style={{
+      minHeight: "100vh",
+      background: "#f8fafc",
+      padding: 16,
+      boxSizing: "border-box",
+      maxWidth: 760,
+      margin: "0 auto",
+    }}
+  >
       <h1 style={{ marginBottom: 16 }}>ラウンド履歴</h1>
 {history.length > 0 && (
   <div
@@ -214,18 +216,15 @@ alignItems: "stretch",
               <div style={{ color: "#64748b", fontSize: 14 }}>
                 {item.playDate || item.date || "-"}
               </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  gap: 8,
-                  flexWrap: "wrap",
-                  marginTop: 12,
-                }}
-              >
-                <InfoChip label="人数" value={item.players?.length || 0} />
-                <InfoChip label="ホール数" value={item.rounds?.length || 0} />
-<InfoChip
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 8,
+    marginTop: 12,
+  }}
+>
+                             <InfoChip
   label="スコア"
   value={`${item.ranking?.[0]?.totalScore || "-"}打`}
 />
@@ -239,11 +238,7 @@ alignItems: "stretch",
   label="パット"
   value={`${item.rounds?.reduce((sum, r) => sum + (Number(r.putt) || 0), 0) || "-"}打`}
 />               
- <InfoChip
-                  label="保存日時"
-                  value={item.date ? String(item.date).slice(0, 16) : "-"}
-                />
-              </div>
+               </div>
 
               {item.ranking && item.ranking.length > 0 && (
                 <div style={{ marginTop: 16 }}>
@@ -278,14 +273,18 @@ alignItems: "stretch",
                           {i + 1}. {player.playerName}
                         </div>
 
-                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                       <div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 8,
+  }}
+>
+
                           <InfoChip label="スコア" value={`${player.totalScore || "-"}打`} />
                           <InfoChip label="差" value={player.diff ?? "-"} />
                           <InfoChip label="OP" value={player.totalOlympic ?? "-"} />
-                          <InfoChip
-                            label="方向"
-                            value={item.rounds?.[0]?.firstPuttDirection || "-"}
-                          />
+                          
                         </div>
                       </div>
                     ))}
@@ -349,6 +348,7 @@ function InfoChip({ label, value }) {
         color: "#0f172a",
       }}
     >
+
       {label}：{value}
     </div>
   );
