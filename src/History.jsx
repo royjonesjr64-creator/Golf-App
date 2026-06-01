@@ -228,11 +228,18 @@ const dateLabel = item.playDate || item.date || "";
                 #{history.length - index}
               </div>
 
-           <h2 style={{ margin: "8px 0 4px" }}>
+<h2 style={{ margin: "8px 0 4px" }}>
   {item.golfName || "ゴルフ場名なし"}
 </h2>
 
-<div style={{ fontWeight: 800, marginBottom: 6, color: "#2563eb" }}>
+<div
+  style={{
+    fontWeight: 800,
+    marginBottom: 6,
+    color: "#2563eb",
+    fontSize: 15,
+  }}
+>
   {item.courseName || "コース名なし"}
 </div>
 {item.tee ? (
