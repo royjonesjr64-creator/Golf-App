@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 export default function History() {
   const navigate = useNavigate();
   const [history, setHistory] = useState([]);
-
+const [selectedClub, setSelectedClub] = useState(null);
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem("golf_history") || "[]");
     setHistory(saved);
@@ -27,8 +27,13 @@ export default function History() {
     localStorage.setItem("golf_history", JSON.stringify(updated));
   };
 
-  const getScore = (item) =>
-    item.totalScore || item.ranking?.[0]?.totalScore || 0;
+  const getScore = (item) => {
+  const score = Number(item.totalScore || item.ranking?.[0]?.totalScore || 0);
+
+  if (!score || score < 50) return 0;
+
+  return score;
+};
 
   const getInside100Total = (item) =>
     (item.rounds || []).reduce((sum, round) => {
@@ -49,7 +54,166 @@ export default function History() {
     (sum, h) => sum + getInside100Total(h),
     0
   );
+const inside100Avg = totalInside100 / Math.max(totalHoles, 1);
 
+const fwKeepRate =
+  history.reduce((keep, h) => {
+    const p = h.rounds?.[0]?.players?.[0];
+    return keep + (p?.fairwayKeep ? 1 : 0);
+  }, 0) / Math.max(history.length, 1);
+
+const puttAverage =
+  history.reduce((sum, h) => sum + (h.totalPutt || 0), 0) /
+  Math.max(history.length, 1);
+
+const weakList = [
+  {
+    name: "ティーショット",
+    score: fwKeepRate < 0.5 ? 3 : fwKeepRate < 0.7 ? 2 : 1,
+    advice: "FWキープ率改善が最優先です",
+  },
+  {
+    name: "100y以内",
+    score: inside100Avg > 2.5 ? 3 : inside100Avg > 2.0 ? 2 : 1,
+    advice: "アプローチ改善で大幅なスコアアップが期待できます",
+  },
+  {
+    name: "パット",
+    score: puttAverage > 36 ? 3 : puttAverage > 32 ? 2 : 1,
+    advice: "3パット削減が最優先です",
+  },
+].sort((a, b) => b.score - a.score);
+
+const weakPoint = weakList[0].name;
+const predictedScore = Math.round(
+  history.reduce((sum, h) => sum + getScore(h), 0) /
+    Math.max(history.filter((h) => getScore(h) > 0).length, 1)
+);
+
+const targetScore = Math.max(72, predictedScore - weakList[0].score * 2);
+const courseRanking = Object.entries(
+  history.reduce((acc, item) => {
+    const course =
+      item.courseName ||
+      item.golfName ||
+      "コース未設定";
+
+    const score = getScore(item);
+
+    if (
+      !acc[course] ||
+      score < acc[course]
+    ) {
+      acc[course] = score;
+    }
+
+    return acc;
+  }, {})
+)
+.sort((a, b) => a[1] - b[1])
+.slice(0, 5);
+const clubHistory = [];
+
+history.forEach((item) => {
+  (item.rounds || []).forEach((round) => {
+    const players = round.players?.length ? round.players : [round];
+
+    players.forEach((player) => {
+      const club =
+        player.club ||
+        player.selectedClub ||
+        player.clubName ||
+        player.clubType ||
+        "";
+
+      const distance =
+        parseInt(
+          String(
+            player.driveDistance ||
+              player.greenOnDistance ||
+              player.distance ||
+              0
+          )
+            .normalize("NFKC")
+            .replace(/[^\d]/g, ""),
+          10
+        ) || 0;
+
+      if (!club || !distance) return;
+
+      clubHistory.push({
+        club,
+        distance,
+        date: item.playDate || item.date || "",
+      });
+    });
+  });
+});
+
+const selectedClubHistory = selectedClub
+  ? clubHistory.filter((item) => item.club === selectedClub)
+  : [];
+const bestRound = history.length
+  ? history.reduce((best, item) => {
+      const score = getScore(item);
+      return score && score < getScore(best) ? item : best;
+    }, history[0])
+  : null;
+
+const bestRoundScore = bestRound ? getScore(bestRound) : 0;
+
+const bestRoundPutts = bestRound
+  ? (bestRound.rounds || []).reduce((sum, r) => {
+      return sum + (r.players || []).reduce((pSum, p) => {
+        return pSum + Number(p.putt || 0);
+      }, 0);
+    }, 0)
+  : 0;
+
+const bestRoundFw = bestRound
+  ? (bestRound.rounds || []).filter((r) => {
+      const p = r.players?.[0] || r;
+      return p.fairwayKeep === "keep";
+    }).length
+  : 0;
+
+const bestRoundFwTotal = bestRound
+  ? (bestRound.rounds || []).filter((r) => {
+      const p = r.players?.[0] || r;
+      return p.fairwayKeep;
+    }).length
+  : 0;
+
+const bestRoundFwRate = Math.round(
+  (bestRoundFw / Math.max(bestRoundFwTotal, 1)) * 100
+);
+
+const validHistory = history.filter((item) => getScore(item) > 0);
+
+const recent5 = validHistory.slice(0, 5);
+const recent5Average = recent5.length
+  ? Math.round(
+      recent5.reduce((sum, item) => sum + getScore(item), 0) /
+        recent5.length
+    )
+
+  : 0;
+const courseAnalysis = Object.entries(
+  validHistory.reduce((acc, item) => {
+ const course = item.courseName || item.golfName || "コース未設定";
+    const score = getScore(item);
+
+    if (!acc[course]) {
+      acc[course] = { count: 0, totalScore: 0, best: 999 };
+    }
+
+    acc[course].count += 1;
+    acc[course].totalScore += score;
+    acc[course].best = Math.min(acc[course].best, score);
+
+    return acc;
+  }, {})
+);
   return (
     <div
       style={{
@@ -61,8 +225,158 @@ export default function History() {
         margin: "0 auto",
       }}
     >
-      <h1 style={{ marginBottom: 16 }}>ラウンド履歴</h1>
 
+      <h1 style={{ marginBottom: 16 }}>ラウンド履歴</h1>
+<div
+  style={{
+    background: "#ffffff",
+    border: "1px solid #e5e7eb",
+    borderRadius: 18,
+    padding: 18,
+    marginBottom: 16,
+    boxShadow: "0 6px 16px rgba(15,23,42,0.05)",
+  }}
+>
+  <h2 style={{ margin: "0 0 12px", color: "#2563eb" }}>
+    コース分析
+  </h2>
+
+  {courseAnalysis.map(([course, data]) => (
+    <div
+      key={course}
+      style={{
+        padding: "12px 0",
+        borderBottom: "1px solid #f3f4f6",
+      }}
+    >
+      <div style={{ fontWeight: 900, fontSize: 16 }}>
+        {course}
+      </div>
+
+      <div style={{ color: "#64748b", marginTop: 6 }}>
+        回数：{data.count}回　
+平均：{Math.round(data.totalScore / data.count)}打　
+Best：{data.best}打　
+改善余地：
+{Math.round(data.totalScore / data.count) - data.best}打
+<div
+  style={{
+    marginTop: 6,
+    color:
+      Math.round(data.totalScore / data.count) - data.best >= 10
+        ? "#ef4444"
+        : "#16a34a",
+    fontWeight: 700,
+  }}
+>
+  {Math.round(data.totalScore / data.count) - data.best >= 10
+    ? "伸びしろ大"
+    : "安定している"}
+</div>
+      </div>
+    </div>
+  ))}
+</div>
+<div
+  style={{
+    background: "#ffffff",
+    border: "1px solid #e5e7eb",
+    borderRadius: 18,
+    padding: 18,
+    marginBottom: 16,
+    boxShadow: "0 6px 16px rgba(15,23,42,0.05)",
+  }}
+>
+  <h2
+    style={{
+      margin: "0 0 12px",
+      color: "#dc2626",
+    }}
+  >
+    弱点自動診断
+  </h2>
+
+ <div style={{ display: "grid", gap: 8 }}>
+  {weakList.map((weak, index) => (
+    <div
+      key={weak.name}
+      style={{
+        background: "#f8fafc",
+        border: "1px solid #e2e8f0",
+        borderRadius: 14,
+        padding: 10,
+      }}
+    >
+      <div style={{ fontWeight: 900 }}>
+        {index === 0 ? "🥇" : index === 1 ? "🥈" : "🥉"} {weak.name}
+      </div>
+
+      <div style={{ color: "#64748b", fontSize: 13, marginTop: 4 }}>
+  {weak.advice}
+
+  {index === 0 && (
+    <div
+      style={{
+        marginTop: 8,
+        padding: 10,
+        background: "#fff7ed",
+        border: "1px solid #fed7aa",
+        borderRadius: 12,
+        fontWeight: 800,
+        color: "#9a3412",
+      }}
+    >
+      改善後の目標スコア：{targetScore}打
+    </div>
+  )}
+</div>
+
+    </div>
+
+  ))}
+
+</div>
+
+</div>
+
+
+{bestRound && (
+  <div
+    style={{
+      background: "#ffffff",
+      border: "1px solid #e5e7eb",
+      borderRadius: 18,
+      padding: 18,
+      marginBottom: 16,
+      boxShadow: "0 6px 16px rgba(15,23,42,0.05)",
+    }}
+  >
+    <h2 style={{ margin: "0 0 12px", color: "#16a34a" }}>
+      ベストラウンド分析
+    </h2>
+
+    <div style={{ fontSize: 30, fontWeight: 900, marginBottom: 8 }}>
+      {bestRoundScore}打
+    </div>
+
+    <div style={{ color: "#64748b", fontWeight: 700, marginBottom: 12 }}>
+      {bestRound.golfName || "ゴルフ場名なし"} / {bestRound.courseName || "コース名なし"}
+    </div>
+
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: 8,
+      }}
+    >
+      <InfoChip label="FW率" value={`${bestRoundFwRate}%`} />
+      <InfoChip label="パット" value={`${bestRoundPutts}打`} />
+      <InfoChip label="100y以内" value={`${getInside100Total(bestRound)}打`} />
+      <InfoChip label="ティー" value={bestRound.tee || "-"} />
+    </div>
+  </div>
+)}
       <div
         style={{
           background: "#ffffff",
@@ -72,6 +386,63 @@ export default function History() {
           marginBottom: 16,
         }}
       >
+<div
+  style={{
+    background: "#fff",
+    border: "1px solid #e5e7eb",
+    borderRadius: 18,
+    padding: 18,
+    marginBottom: 16,
+  }}
+>
+  <h2
+    style={{
+      margin: "0 0 12px",
+      color: "#d97706",
+    }}
+  >
+    🏆 コース別ベストランキング
+  </h2>
+
+  {courseRanking.map(
+    ([course, score], index) => (
+      <div
+        key={course}
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          padding: "10px 0",
+          borderBottom:
+            index !== courseRanking.length - 1
+              ? "1px solid #f3f4f6"
+              : "none",
+        }}
+      >
+        <div>
+          {index === 0
+            ? "🥇"
+            : index === 1
+            ? "🥈"
+            : index === 2
+            ? "🥉"
+            : "🏌️"}
+
+          {" "}
+          {course}
+        </div>
+
+        <div
+          style={{
+            fontWeight: 700,
+            color: "#2563eb",
+          }}
+        >
+          {score}打
+        </div>
+      </div>
+    )
+  )}
+</div>
         <h2 style={{ margin: "0 0 12px" }}>コース別成績</h2>
 
         <div
@@ -90,28 +461,36 @@ export default function History() {
           {Object.entries(
             history.reduce((acc, item) => {
               (item.rounds || []).forEach((round) => {
-                (round.players || []).forEach((player) => {
+               const players = round.players?.length ? round.players : [round];
+
+players.forEach((player) => {
                   const club =
                     player.club ||
                     player.selectedClub ||
                     player.clubName ||
                     "";
 
-                  const distance = Number(
-                    player.driveDistance ||
-                      player.greenOnDistance ||
-                      player.distance ||
-                      0
-                  );
-
+                  const distance =
+  parseInt(
+    String(
+      player.driveDistance ||
+      player.greenOnDistance ||
+      player.distance ||
+      0
+    )
+      .normalize("NFKC")
+      .replace(/[^\d]/g, ""),
+    10
+  ) || 0;
                   if (!club || !distance) return;
 
-                  if (!acc[club]) {
-                    acc[club] = { count: 0, total: 0 };
-                  }
+                 if (!acc[club]) {
+  acc[club] = { count: 0, total: 0, best: 0 };
+}
 
-                  acc[club].count += 1;
-                  acc[club].total += distance;
+acc[club].count += 1;
+acc[club].total += distance;
+acc[club].best = Math.max(acc[club].best, distance);
                 });
               });
 
@@ -125,30 +504,41 @@ export default function History() {
             )
             .map(([club, data]) => {
               const average = Math.round(data.total / data.count);
+const best = data.best || data.max || data.bestDistance || average;
               const maxDistance = Math.max(
                 1,
                 ...Object.entries(
                   history.reduce((acc, item) => {
                     (item.rounds || []).forEach((round) => {
                       (round.players || []).forEach((player) => {
-                        const c =
-                          player.club ||
-                          player.selectedClub ||
-                          player.clubName ||
-                          "";
-
-                        const d = Number(
-                          player.driveDistance ||
-                            player.greenOnDistance ||
-                            player.distance ||
-                            0
-                        );
+const c =
+  player.club ||
+  player.selectedClub ||
+  player.clubName ||
+  player.clubType ||
+  "";
+                       const d =
+  parseInt(
+    String(
+      player.driveDistance ||
+        player.greenOnDistance ||
+        player.distance ||
+        0
+    ).replace(/[^\d]/g, ""),
+    10
+  ) || 0;
 
                         if (!c || !d) return;
-                        if (!acc[c]) acc[c] = { total: 0, count: 0 };
-
-                        acc[c].total += d;
-                        acc[c].count += 1;
+                      if (!acc[c]) {
+  acc[c] = {
+    total: 0,
+    count: 0,
+    best: 0,
+  };
+}
+acc[c].total += d;
+acc[c].count += 1;
+acc[c].best = Math.max(acc[c].best, d);
                       });
                     });
 
@@ -178,9 +568,17 @@ export default function History() {
                       marginBottom: 6,
                     }}
                   >
-                    <div style={{ fontWeight: 800, fontSize: 16 }}>
-                      {club}
-                    </div>
+                   <div
+  onClick={() => setSelectedClub(club)}
+  style={{
+    fontWeight: 800,
+    fontSize: 16,
+    cursor: "pointer",
+    color: selectedClub === club ? "#2563eb" : "#111827",
+  }}
+>
+  {club}
+</div>
 
                     <div
                       style={{
@@ -214,6 +612,9 @@ export default function History() {
 
                   <div style={{ fontSize: 13, color: "#64748b" }}>
                     使用回数：{data.count}回
+<div style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>
+  Best：{best}Y
+</div>
                   </div>
                 </div>
               );
@@ -252,8 +653,87 @@ export default function History() {
             </div>
           </div>
         ))}
-      </div>
+{selectedClub && (
+  <div
+    style={{
+      marginTop: 16,
+      padding: 14,
+      background: "#eff6ff",
+      border: "1px solid #bfdbfe",
+      borderRadius: 14,
+    }}
+  >
+    <h3 style={{ margin: "0 0 10px", color: "#2563eb" }}>
+      {selectedClub} 飛距離推移
+    </h3>
 
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+      {selectedClubHistory.map((item, index) => (
+        <div
+          key={index}
+          style={{
+            padding: "7px 12px",
+            background: "#2563eb",
+            color: "#ffffff",
+            borderRadius: 999,
+            fontWeight: 800,
+            fontSize: 13,
+          }}
+        >
+          {item.distance}Y
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+      </div>
+      <div
+        style={{
+          marginBottom: 18,
+          background: "#ffffff",
+          border: "1px solid #e5e7eb",
+          borderRadius: 18,
+          padding: 18,
+          boxShadow: "0 6px 16px rgba(15,23,42,0.05)",
+        }}
+      >
+        <h2 style={{ margin: "0 0 14px", color: "#2563eb" }}>
+          ティー別成績
+        </h2>
+
+        {Object.entries(
+          history.reduce((acc, item) => {
+            const tee = item.tee || "未設定";
+            const score = getScore(item);
+
+            if (!acc[tee]) {
+              acc[tee] = { count: 0, total: 0, best: 999 };
+            }
+
+            acc[tee].count += 1;
+            acc[tee].total += Number(score);
+            acc[tee].best = Math.min(acc[tee].best, Number(score));
+
+            return acc;
+          }, {})
+        ).map(([tee, data]) => (
+          <div
+            key={tee}
+            style={{
+              padding: "10px 0",
+              borderBottom: "1px solid #f3f4f6",
+            }}
+          >
+            <div style={{ fontWeight: 700, fontSize: 18 }}>{tee}</div>
+
+            <div style={{ color: "#64748b", marginTop: 4 }}>
+              回数: {data.count}回　 平均:
+              {Math.round(data.total / data.count)}打　 ベスト:
+              {data.best}打
+            </div>
+          </div>
+        ))}
+      </div>
       {history.length > 0 && (
         <div
           style={{
@@ -267,10 +747,14 @@ export default function History() {
           <InfoChip
             label="平均"
             value={Math.round(
-              history.reduce((sum, h) => sum + getScore(h), 0) /
-                history.length
-            )}
+  validHistory.reduce((sum, h) => sum + getScore(h), 0) /
+    Math.max(validHistory.length, 1)
+)}
           />
+<InfoChip
+  label="最近5R"
+  value={recent5Average}
+/>
 
           <InfoChip
             label="Best"
@@ -367,44 +851,7 @@ export default function History() {
           boxShadow: "0 6px 16px rgba(15,23,42,0.05)",
         }}
       >
-        <h2 style={{ margin: "0 0 14px", color: "#2563eb" }}>
-          ティー別成績
-        </h2>
-
-        {Object.entries(
-          history.reduce((acc, item) => {
-            const tee = item.tee || "未設定";
-            const score = getScore(item);
-
-            if (!acc[tee]) {
-              acc[tee] = { count: 0, total: 0, best: 999 };
-            }
-
-            acc[tee].count += 1;
-            acc[tee].total += Number(score);
-            acc[tee].best = Math.min(acc[tee].best, Number(score));
-
-            return acc;
-          }, {})
-        ).map(([tee, data]) => (
-          <div
-            key={tee}
-            style={{
-              padding: "10px 0",
-              borderBottom: "1px solid #f3f4f6",
-            }}
-          >
-            <div style={{ fontWeight: 700, fontSize: 18 }}>
-              {tee}
-            </div>
-
-            <div style={{ color: "#64748b", marginTop: 4 }}>
-              回数: {data.count}回　 平均:
-              {Math.round(data.total / data.count)}打　 ベスト:
-              {data.best}打
-            </div>
-          </div>
-        ))}
+        
       </div>
 
       {history.length > 0 && (
@@ -428,10 +875,10 @@ export default function History() {
               height: 180,
             }}
           >
-            {history
-              .slice()
-              .reverse()
-              .map((item, index) => {
+           {validHistory
+  .slice()
+  .reverse()
+  .map((item, index) => {
                 const score =
                   getScore(item) ||
                   item.rounds?.reduce(
@@ -439,11 +886,9 @@ export default function History() {
                     0
                   ) ||
                   0;
-
-                const barHeight = score
-                  ? Math.min(120, Math.max(20, score))
-                  : 20;
-
+const barHeight = score
+  ? Math.max(20, 140 - (score - 70) * 2)
+  : 20;
                 return (
                   <div
                     key={item.id || index}
@@ -466,7 +911,12 @@ export default function History() {
                         width: 8,
                         height: 8,
                         borderRadius: 999,
-                        background: "#16a34a",
+                       background:
+  score <= 89
+    ? "#16a34a"
+    : score <= 99
+    ? "#f59e0b"
+    : "#ef4444",
                         marginBottom: 4,
                         zIndex: 1,
                       }}
@@ -477,11 +927,17 @@ export default function History() {
                         width: "70%",
                         height: barHeight,
                         borderRadius: "10px 10px 0 0",
-                        background: "#16a34a",
+                        background:
+  score <= 89
+    ? "#16a34a"
+    : score <= 99
+    ? "#f59e0b"
+    : "#ef4444",
+
                       }}
                     />
 
-                    {index < history.length - 1 && (
+                   {index < validHistory.length - 1 && (
                       <div
                         style={{
                           position: "absolute",
@@ -528,13 +984,16 @@ export default function History() {
         <div style={{ display: "grid", gap: 16 }}>
           {history.map((item, index) => (
             <div
-              key={item.id || index}
-              style={{
+  key={item.id || index}
+  onClick={() => openDetail(item)}
+  className="tap-card"
+  style={{
                 background: "#fff",
                 border: "1px solid #e5e7eb",
                 borderRadius: 18,
                 padding: 18,
                 boxShadow: "0 6px 16px rgba(15,23,42,0.05)",
+cursor: "pointer",
               }}
             >
               <div style={{ color: "#64748b", fontSize: 13 }}>
@@ -582,7 +1041,7 @@ export default function History() {
               >
                 <InfoChip
                   label="スコア"
-                  value={`${item.ranking?.[0]?.totalScore || "-"}打`}
+                  value={`${getScore(item) || "-"}打`}
                 />
 
                 <InfoChip
@@ -670,8 +1129,12 @@ export default function History() {
                 }}
               >
                 <button
-                  onClick={() => openDetail(item)}
-                  style={{
+  onClick={(e) => {
+    e.stopPropagation();
+    openDetail(item);
+  }}
+  className="primary-btn"
+  style={{
                     padding: "10px 16px",
                     borderRadius: 12,
                     border: "1px solid #2563eb",
@@ -682,10 +1145,12 @@ export default function History() {
                 >
                   詳細
                 </button>
-
-                <button
-                  onClick={() => deleteRound(item.id)}
-                  style={{
+<button
+  onClick={(e) => {
+    e.stopPropagation();
+    deleteRound(item.id);
+  }}
+  className="danger-btn"                  style={{
                     padding: "10px 16px",
                     borderRadius: 12,
                     border: "1px solid #ef4444",

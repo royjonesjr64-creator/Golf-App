@@ -93,9 +93,15 @@ penalty: "",
         greenOnDistance: String(holeData.players[idx]?.greenOnDistance ?? ""),
         driveDistance: String(holeData.players[idx]?.driveDistance ?? ""),
         fairwayKeep: holeData.players[idx]?.fairwayKeep || "",
-        club: holeData.players[idx]?.club || "",
-        putt: String(holeData.players[idx]?.putt ?? ""),
-        eventChecks: holeData.players[idx]?.eventChecks || {}
+club: holeData.players[idx]?.club || "",
+putt: String(holeData.players[idx]?.putt ?? ""),
+
+firstPuttDirection: holeData.players[idx]?.firstPuttDirection || "",
+firstPuttSlope: holeData.players[idx]?.firstPuttSlope || "",
+firstPuttBreak: holeData.players[idx]?.firstPuttBreak || "",
+penalty: holeData.players[idx]?.penalty || "",
+
+eventChecks: holeData.players[idx]?.eventChecks || {}
       }));
       setRows(nextRows);
     } else {
@@ -335,15 +341,19 @@ penalty: "",
       hole,
       players: rows.map((row, index) => ({
         playerName: playerNames[index] || `Player ${index + 1}`,
-        score: Number(row.score) || 0,
-        inside100: Number(row.inside100) || 0,
-        greenOnDistance: Number(row.greenOnDistance) || 0,
-        driveDistance: Number(row.driveDistance) || 0,
-        fairwayKeep: row.fairwayKeep || "",
-        club: row.club || "",
-        putt: Number(row.putt) || 0,
+score: Number(row.score) || 0,
+inside100: Number(row.inside100) || 0,
+greenOnDistance: Number(row.greenOnDistance) || 0,
+driveDistance: Number(row.driveDistance) || 0,
+fairwayKeep: row.fairwayKeep || "",
+club: row.club || "",
+putt: Number(row.putt) || 0,
+
+firstPuttDirection: row.firstPuttDirection || "",
+firstPuttSlope: row.firstPuttSlope || "",
+firstPuttBreak: row.firstPuttBreak || "",
 penalty: row.penalty || "",
-        eventChecks: row.eventChecks || {}
+eventChecks: row.eventChecks || {},
       }))
     };
 
@@ -356,7 +366,9 @@ penalty: row.penalty || "",
   };
 
   const nextHole = () => {
+  setTimeout(() => {
     saveRound();
+
     if (hole < holeCount) {
       const h = hole + 1;
       setHole(h);
@@ -365,7 +377,8 @@ penalty: row.penalty || "",
     } else {
       navigate("/result");
     }
-  };
+  }, 300);
+};
 
   const prevHole = () => {
     saveRound();

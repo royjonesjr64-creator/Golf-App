@@ -43,7 +43,7 @@ const [selectedCourse, setSelectedCourse] = useState("");
     localStorage.getItem("playDate") || ""
   );
 const [tee, setTee] = useState(
-  localStorage.getItem("tee") || "白"
+  localStorage.getItem("tee") || ""
 );
   const updatePlayer = (index, value) => {
     const next = [...players];
@@ -61,6 +61,7 @@ const [tee, setTee] = useState(
   };
 
   const handleNext = () => {
+
     const cleanedPlayers = players.map((p) => p.trim()).filter(Boolean);
 
     localStorage.setItem("players", JSON.stringify(cleanedPlayers));
@@ -86,6 +87,7 @@ if (selectedCourseData && Array.isArray(selectedCourseData.holes)) {  localStora
 )
   );
 }
+
     localStorage.setItem("playDate", playDate);
 localStorage.setItem("tee", tee);
     localStorage.removeItem("rounds");

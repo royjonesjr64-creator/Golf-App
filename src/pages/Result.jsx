@@ -139,10 +139,12 @@ if (isActive && playerRow?.eventChecks?.[key]) {
     return players.map((playerName, playerIndex) => {
       const playerRounds = rounds.map((round, idx) => {
         const row = round.players?.[playerIndex] || {};
+
         const par = Number(pars[idx]) || 4;
         const score = Number(row.score) || 0;
         const putt = Number(row.putt) || 0;
-        const driveDistance = Number(row.driveDistance) || 0;
+        const driveDistance =
+  Number(row.players?.[0]?.driveDistance || row.driveDistance) || 0;
         const fairwayKeep = row.fairwayKeep || "";
 
         return {
@@ -155,6 +157,11 @@ if (isActive && playerRow?.eventChecks?.[key]) {
           fairwayKeep,
           club: row.club || "-",
           putt,
+firstPuttDirection: row.firstPuttDirection || "-",
+firstPuttSlope: row.firstPuttSlope || "-",
+firstPuttBreak: row.firstPuttBreak || "-",
+penalty: row.penalty || "",
+eventChecks: row.eventChecks || {},
           roleText: getRoleText(row),
           olympicPoint: calcOlympicPoint(row),
           diffLabel: getDiffLabel(score, par),
@@ -269,10 +276,19 @@ avgInside100,
 tee,
       playDate,
       players,
-     rounds: rounds.map(r => ({
-  ...r,
-  firstPuttDirection: r.firstPuttDirection || "-"
-})),
+     rounds: rounds.map((r) => {
+  const player = r.players?.[0] || {};
+
+  return {
+    ...r,
+    firstPuttDirection: player.firstPuttDirection || r.firstPuttDirection || "-",
+    firstPuttSlope: player.firstPuttSlope || r.firstPuttSlope || "-",
+    firstPuttBreak: player.firstPuttBreak || r.firstPuttBreak || "-",
+    penalty: player.penalty || r.penalty || "",
+    fairwayKeep: player.fairwayKeep || r.fairwayKeep || "-",
+    eventChecks: player.eventChecks || r.eventChecks || {},
+  };
+}),
       pars,
       events,
       ranking: playerSummaries
@@ -292,7 +308,7 @@ const updated = [newDataWithTotal, ...saved];
 
     nav("/history");
   };
-
+console.log("RESULT DATA", rounds);
   return (
     <div
       style={{
@@ -625,9 +641,28 @@ const updated = [newDataWithTotal, ...saved];
   </div>
 }
 />
-          <MiniBox label="役" value={r.roleText} />
-          <MiniBox label="OP" value={r.olympicPoint} />
-        </div>
+        <MiniBox label="役" value={r.roleText} />
+<MiniBox label="OP" value={r.olympicPoint} />
+<MiniBox label="1st方向" value={r.players?.[0]?.firstPuttDirection || r.firstPuttDirection || "-"} />
+<MiniBox label="1st傾斜" value={r.players?.[0]?.firstPuttSlope || r.firstPuttSlope || "-"} />
+<MiniBox label="1st曲がり" value={r.players?.[0]?.firstPuttBreak || r.firstPuttBreak || "-"} />
+<MiniBox label="ペナルティ" value={r.players?.[0]?.penalty || r.penalty || "なし"} />
+<MiniBox label="FW" value={r.players?.[0]?.fairwayKeep || r.fairwayKeep || "-"} />
+<MiniBox
+  label="飛距離"
+  value={Number(r.driveDistance) ? `${r.driveDistance}Y` : "-"}
+/>
+<MiniBox
+  label="イベント"
+  value={
+   Object.entries(r.players?.[0]?.eventChecks || r.eventChecks || {})
+      .filter(([_, v]) => v)
+      .map(([k]) => k)
+      .join(" / ") || "-"
+  }
+/>
+
+  </div>
       </div>
     )}
   </div>
