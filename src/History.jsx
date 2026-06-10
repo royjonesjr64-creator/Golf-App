@@ -5,7 +5,10 @@ export default function History() {
   const navigate = useNavigate();
   const [history, setHistory] = useState([]);
 const [selectedClub, setSelectedClub] = useState(null);
-  useEffect(() => {
+  
+const [targetScore, setTargetScore] = useState(90);
+useEffect(() => {
+
     const saved = JSON.parse(localStorage.getItem("golf_history") || "[]");
     setHistory(saved);
   }, []);
@@ -14,7 +17,16 @@ const [selectedClub, setSelectedClub] = useState(null);
     localStorage.setItem("rounds", JSON.stringify(item.rounds || []));
     localStorage.setItem("pars", JSON.stringify(item.pars || []));
     localStorage.setItem("players", JSON.stringify(item.players || []));
-    localStorage.setItem("events", JSON.stringify(item.events || []));
+    localStorage.setItem( "olympicEvents", JSON.stringify(item.olympicEvents || []));
+localStorage.setItem(
+  "events",
+  JSON.stringify(item.events || item.olympicEvents || [])
+);
+
+localStorage.setItem(
+  "olympicEvents",
+  JSON.stringify(item.olympicEvents || item.events || [])
+);
     localStorage.setItem("golfName", item.golfName || "");
     localStorage.setItem("courseName", item.courseName || "");
     localStorage.setItem("playDate", item.playDate || "");
@@ -83,14 +95,39 @@ const weakList = [
     advice: "3パット削減が最優先です",
   },
 ].sort((a, b) => b.score - a.score);
-
+<div
+  style={{
+    marginTop: 10,
+    padding: 10,
+    background: "#fff7ed",
+    border: "1px solid #fdba74",
+    borderRadius: 10,
+    fontWeight: 700,
+    color: "#9a3412",
+  }}
+>
+  改善見込み：
+  約{weakList[0].score * 2}打アップ
+</div>
 const weakPoint = weakList[0].name;
 const predictedScore = Math.round(
   history.reduce((sum, h) => sum + getScore(h), 0) /
     Math.max(history.filter((h) => getScore(h) > 0).length, 1)
 );
 
-const targetScore = Math.max(72, predictedScore - weakList[0].score * 2);
+const suggestedTargetScore = Math.max(72, predictedScore - weakList[0].score * 2);
+
+const targetAchievement = Math.min(
+  100,
+  Math.max(
+    0,
+    Math.round(
+      ((predictedScore - targetScore) /
+        Math.max(predictedScore - suggestedTargetScore, 1)) *
+        100
+    )
+  )
+);
 const courseRanking = Object.entries(
   history.reduce((acc, item) => {
     const course =
@@ -189,7 +226,13 @@ const bestRoundFwRate = Math.round(
 );
 
 const validHistory = history.filter((item) => getScore(item) > 0);
+const under90Count = validHistory.filter(
+  (h) => getScore(h) <= 90
+).length;
 
+const under90Rate = Math.round(
+  (under90Count / Math.max(validHistory.length, 1)) * 100
+);
 const recent5 = validHistory.slice(0, 5);
 const recent5Average = recent5.length
   ? Math.round(
@@ -198,6 +241,7 @@ const recent5Average = recent5.length
     )
 
   : 0;
+
 const courseAnalysis = Object.entries(
   validHistory.reduce((acc, item) => {
  const course = item.courseName || item.golfName || "コース未設定";
@@ -227,6 +271,149 @@ const courseAnalysis = Object.entries(
     >
 
       <h1 style={{ marginBottom: 16 }}>ラウンド履歴</h1>
+<div
+  style={{
+    background: "#eff6ff",
+    border: "1px solid #bfdbfe",
+    borderRadius: 18,
+    padding: 16,
+    marginBottom: 16,
+  }}
+>
+  <h2 style={{ margin: "0 0 12px", color: "#2563eb" }}>
+    🎯 目標スコア
+  </h2>
+
+  <input
+    type="number"
+    value={targetScore}
+    onChange={(e) => {
+      setTargetScore(Number(e.target.value));
+      localStorage.setItem("targetScore", e.target.value);
+    }}
+    style={{
+      width: 100,
+      padding: 10,
+      borderRadius: 10,
+      border: "1px solid #cbd5e1",
+      fontSize: 20,
+      fontWeight: 900,
+      marginBottom: 10,
+    }}
+  />
+
+  <div style={{ fontWeight: 800 }}>
+    現在平均：{predictedScore || "-"}打
+  </div>
+<div style={{ fontWeight: 800, marginTop: 4, color: "#2563eb" }}>
+  最近5R平均：{recent5Average || "-"}打
+</div>
+<div style={{ fontWeight: 800, marginTop: 4, color: "#16a34a" }}>
+  ベスト：{Math.min(...validHistory.map((h) => getScore(h)))}打
+</div>
+
+<div style={{ fontWeight: 800, marginTop: 4, color: "#64748b" }}>
+  ベストとの差：
+  {predictedScore - Math.min(...validHistory.map((h) => getScore(h)))}打
+</div>
+  <div style={{ fontWeight: 800, color: "#dc2626", marginTop: 6 }}>
+    目標まであと {Math.max(0, predictedScore - targetScore)}打
+  </div>
+
+  <div
+  style={{
+    marginTop: 10,
+    padding: 16,
+    background: "#ffffff",
+    borderRadius: 12,
+    textAlign: "center",
+  }}
+>
+  <div style={{ fontSize: 12, color: "#64748b" }}>
+    改善後予想
+  </div>
+
+  <div
+    style={{
+      fontSize: 32,
+      fontWeight: 900,
+      color: "#16a34a",
+    }}
+  >
+    {suggestedTargetScore}打
+  </div>
+</div>
+<div
+  style={{
+    marginTop: 10,
+    padding: 10,
+    background: "#ecfeff",
+    borderRadius: 12,
+  }}
+>
+  <div
+    style={{
+      fontSize: 12,
+      fontWeight: 800,
+      marginBottom: 6,
+      color: "#0891b2",
+    }}
+  >
+    目標達成率
+  </div>
+
+  <div
+    style={{
+      width: "100%",
+      height: 14,
+      background: "#e5e7eb",
+      borderRadius: 999,
+      overflow: "hidden",
+    }}
+  >
+    <div
+      style={{
+        width: `${Math.min(
+          100,
+          Math.round(
+            ((predictedScore - targetScore) /
+              Math.max(predictedScore - suggestedTargetScore, 1)) *
+              100
+          )
+        )}%`,
+        height: "100%",
+        background: "#22c55e",
+      }}
+    />
+  </div>
+
+  <div
+    style={{
+      marginTop: 6,
+      fontWeight: 800,
+      textAlign: "center",
+    }}
+  >
+    {Math.min(
+      100,
+      Math.round(
+        Math.max(
+  0,
+  Math.min(
+    100,
+    Math.round(
+      ((predictedScore - suggestedTargetScore) /
+        Math.max(predictedScore - targetScore, 1)) *
+        100
+    )
+  )
+)
+      )
+    )}
+    %
+  </div>
+</div>
+</div>
 <div
   style={{
     background: "#ffffff",
@@ -314,21 +501,47 @@ Best：{data.best}打　
       <div style={{ color: "#64748b", fontSize: 13, marginTop: 4 }}>
   {weak.advice}
 
-  {index === 0 && (
+ {index === 0 && (
+  <div
+    style={{
+      marginTop: 8,
+      padding: 10,
+      background: "#fff7ed",
+      border: "1px solid #fdba74",
+      borderRadius: 12,
+      fontWeight: 800,
+      color: "#9a3412",
+    }}
+  >
+    <div>改善見込み：約{weak.score * 2}打</div>
+
     <div
       style={{
-        marginTop: 8,
-        padding: 10,
-        background: "#fff7ed",
-        border: "1px solid #fed7aa",
-        borderRadius: 12,
-        fontWeight: 800,
-        color: "#9a3412",
+        marginTop: 6,
+        color: "#16a34a",
+        fontWeight: 900,
       }}
     >
+      改善後予想：{predictedScore - weak.score * 2}打
+    </div>
+
+    <div style={{ marginTop: 6 }}>
       改善後の目標スコア：{targetScore}打
     </div>
-  )}
+<div
+  style={{
+    marginTop: 8,
+    paddingTop: 8,
+    borderTop: "1px dashed #fdba74",
+    fontWeight: 900,
+    color: "#dc2626",
+    textAlign: "center",
+  }}
+>
+  あと {Math.max(0, (predictedScore - weak.score * 2) - targetScore)} 打で目標達成
+</div>
+  </div>
+)}
 </div>
 
     </div>
@@ -666,24 +879,76 @@ acc[c].best = Math.max(acc[c].best, d);
     <h3 style={{ margin: "0 0 10px", color: "#2563eb" }}>
       {selectedClub} 飛距離推移
     </h3>
+<div style={{ marginBottom: 10, fontWeight: 800, color: "#2563eb" }}>
+  飛距離グラフ
+</div>
+<div
+  style={{
+   display: "flex",
+alignItems: "flex-end",
+justifyContent: "center",
+gap: 16,
+height: 160,
+paddingTop: 20,
+overflowX: "auto",
+  }}
+>
+  {selectedClubHistory.map((item, index) => {
+    const maxDistance = Math.max(
+      ...selectedClubHistory.map((x) => x.distance),
+      1
+    );
 
-    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-      {selectedClubHistory.map((item, index) => (
+    const barHeight = Math.max(
+      20,
+      (item.distance / maxDistance) * 120
+    );
+
+    return (
+      <div
+        key={index}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          minWidth: 40,
+        }}
+      >
         <div
-          key={index}
           style={{
-            padding: "7px 12px",
-            background: "#2563eb",
-            color: "#ffffff",
-            borderRadius: 999,
+            fontSize: 11,
             fontWeight: 800,
-            fontSize: 13,
+            marginBottom: 4,
           }}
         >
-          {item.distance}Y
+          {item.distance}
         </div>
-      ))}
-    </div>
+
+        <div
+          style={{
+            width: 24,
+            height: `${barHeight}px`,
+            background:
+  item.distance === maxDistance
+    ? "#ef4444"
+    : "#2563eb",
+            borderRadius: "8px 8px 0 0",
+          }}
+        />
+
+        <div
+          style={{
+            marginTop: 4,
+            fontSize: 10,
+            color: "#64748b",
+          }}
+        >
+          {index + 1}
+        </div>
+      </div>
+    );
+  })}
+</div>   
   </div>
 )}
       </div>
@@ -1030,7 +1295,36 @@ cursor: "pointer",
               <div style={{ color: "#64748b", fontSize: 14 }}>
                 {item.playDate || item.date || "-"}
               </div>
-
+{item.ranking?.length > 0 && (
+  <div
+    style={{
+      marginTop: 8,
+      padding: 8,
+      background: "#fef3c7",
+      borderRadius: 10,
+      fontWeight: 800,
+      color: "#92400e",
+    }}
+  >
+    🏆 OP優勝：
+    {item.ranking
+      .slice()
+      .sort(
+        (a, b) =>
+          Number(b.totalOlympic || 0) -
+          Number(a.totalOlympic || 0)
+      )[0]?.playerName}
+    （
+    {item.ranking
+      .slice()
+      .sort(
+        (a, b) =>
+          Number(b.totalOlympic || 0) -
+          Number(a.totalOlympic || 0)
+      )[0]?.totalOlympic || 0}
+    pt）
+  </div>
+)}
               <div
                 style={{
                   display: "grid",
@@ -1111,9 +1405,10 @@ cursor: "pointer",
                           />
                           <InfoChip label="差" value={player.diff ?? "-"} />
                           <InfoChip
-                            label="OP"
-                            value={player.totalOlympic ?? "-"}
-                          />
+  label="オリンピック"
+  value={player.totalOlympic ?? player.olympicPoint ?? player.olympicTotal ?? "-"}
+/>
+
                         </div>
                       </div>
                     ))}

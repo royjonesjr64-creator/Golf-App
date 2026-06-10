@@ -97,7 +97,8 @@ export default function Result() {
 const events = Array.isArray(savedEvents)
   ? savedEvents.filter((e) => e)
   : [];
-
+console.log("EVENTS", events);
+console.log("ROUNDS", rounds);
   const golfName =
     localStorage.getItem("golfName") ||
     localStorage.getItem("golfCourse") ||
@@ -106,28 +107,40 @@ const events = Array.isArray(savedEvents)
 const tee = localStorage.getItem("tee") || "白";
   const playDate = localStorage.getItem("playDate") || "";
 
- const calcOlympicPoint = (playerRow) => {
+const calcOlympicPoint = (playerRow) => {
   let p = 0;
-  events.forEach((e) => {
-    const key = e.key || e.label;
-    const isActive = e.active || e.enabled || e.isActive;
+  const checks = playerRow?.eventChecks || {};
 
-    if (isActive && playerRow?.eventChecks?.[key]) {
-      p += Number(e.point) || 0;
+  Object.entries(checks).forEach(([checkKey, checked]) => {
+    if (!checked) return;
+
+    const found = events.find((e) => {
+      return (
+        e.key === checkKey ||
+        e.label === checkKey ||
+        e.name === checkKey ||
+        e.id === checkKey
+      );
+    });
+
+    if (found) {
+      p += Number(found.point || found.points || found.score || found.value || 0);
     }
   });
-  return p;
-};
 
- const getRoleText = (playerRow) => {
+  return p;
+}; const getRoleText = (playerRow) => {
   const labels = [];
+  const checks = playerRow?.eventChecks || {};
 
   events.forEach((e) => {
-   const key = e.key || e.label;
-const isActive = e.active || e.enabled || e.isActive;
+    const keys = [e.key, e.label, e.name, e.id].filter(Boolean);
+    const isActive = e.active !== false && e.enabled !== false && e.isActive !== false;
 
-if (isActive && playerRow?.eventChecks?.[key]) {
-      labels.push(e.label);
+    const checked = keys.some((key) => checks[key]);
+
+    if (isActive && checked) {
+      labels.push(e.label || e.name || e.key);
     }
   });
 
@@ -249,7 +262,9 @@ avgInside100,
   }, [players, rounds, pars, events]);
 
   const ranking = [...playerSummaries].sort((a, b) => a.totalScore - b.totalScore);
-
+const olympicRanking = [...playerSummaries].sort(
+  (a, b) => b.totalOlympic - a.totalOlympic
+);
   const toggleOpen = (name) => {
     setOpenPlayers((prev) => ({
       ...prev,
@@ -290,8 +305,9 @@ tee,
   };
 }),
       pars,
-      events,
-      ranking: playerSummaries
+events,
+olympicEvents: events,
+ranking: playerSummaries
     };
 const totalScore = rounds.reduce((sum, r) => sum + (Number(r.score) || 0), 0);
 const totalPutt = rounds.reduce((sum, r) => sum + (Number(r.putt) || 0), 0);
@@ -368,9 +384,12 @@ console.log("RESULT DATA", rounds);
           <h2 style={{ marginTop: 0, marginBottom: 10, fontSize: 20 }}>
             全員スコア一覧
           </h2>
+<h2 style={{ marginTop: 18, marginBottom: 10, fontSize: 20 }}>
+  🏆 オリンピックランキング
+</h2>
 
           <div style={{ display: "grid", gap: 10 }}>
-            {ranking.map((player, idx) => (
+            {olympicRanking.map((player, idx) => (
               <div
                 key={player.playerName}
                 style={{
@@ -435,48 +454,20 @@ console.log("RESULT DATA", rounds);
                           color: "#64748b"
                         }}
                       >
-                        平均 {player.avg} / OP {player.totalOlympic}
+                        OP {player.totalOlympic}pt
                       </div>
                     </div>
                   </div>
-
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: 6,
-                      flexWrap: "wrap",
-                      alignItems: "center"
-                    }}
-                  >
-                    <div
-                      style={{
-                        padding: "6px 12px",
-                        borderRadius: 999,
-                        background: "#f8fafc",
-                        border: "1px solid #dbe2ea",
-                        fontWeight: 900,
-                        fontSize: 18,
-                        color: "#0f172a"
-                      }}
-                    >
-                     {player.totalScore || "-"}打
-                    </div>
-
-                    
-                    <StatChip
-                      label="平均Driver"
-                      value={
-                        player.avgDriverDistance === "-"
-                          ? "-"
-                          : `${player.avgDriverDistance}Y`
-                      }
-                    />
-                    <StatChip label="FW率" value={player.fwRate} />
-<StatChip label="平均100Y" value={player.avgInside100} />
-<StatChip label="平均PUTT" value={player.avgPutt} />
-                    <StatChip label="ワンオン率" value={player.oneOnRate} />
-                    <StatChip label="GIR率" value={player.girRate} />
-                  </div>
+<div
+  style={{
+    fontSize: 22,
+    fontWeight: 900,
+    color: "#f59e0b",
+  }}
+>
+  {player.totalOlympic}pt
+</div>
+                  
                 </div>
               </div>
 
@@ -628,7 +619,7 @@ console.log("RESULT DATA", rounds);
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 80px",
+            gridTemplateColumns: "1fr 1fr",
             gap: 8
           }}
         >
@@ -641,7 +632,7 @@ console.log("RESULT DATA", rounds);
   </div>
 }
 />
-        <MiniBox label="役" value={r.roleText} />
+    <MiniBox label="役" value={r.roleText} />
 <MiniBox label="OP" value={r.olympicPoint} />
 <MiniBox label="1st方向" value={r.players?.[0]?.firstPuttDirection || r.firstPuttDirection || "-"} />
 <MiniBox label="1st傾斜" value={r.players?.[0]?.firstPuttSlope || r.firstPuttSlope || "-"} />
@@ -653,16 +644,21 @@ console.log("RESULT DATA", rounds);
   value={Number(r.driveDistance) ? `${r.driveDistance}Y` : "-"}
 />
 <MiniBox
-  label="イベント"
+  label="オリンピック"
   value={
-   Object.entries(r.players?.[0]?.eventChecks || r.eventChecks || {})
+    Object.entries(r.eventChecks || {})
       .filter(([_, v]) => v)
-      .map(([k]) => k)
+      .map(([k]) => {
+        const found = events.find(
+          (e) => e.key === k || e.label === k
+        );
+
+        return found?.label || k;
+      })
       .join(" / ") || "-"
   }
 />
-
-  </div>
+ </div>
       </div>
     )}
   </div>

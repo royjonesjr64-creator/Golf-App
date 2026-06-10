@@ -365,18 +365,31 @@ eventChecks: row.eventChecks || {},
     localStorage.setItem("rounds", JSON.stringify(updated));
   };
 
-  const nextHole = () => {
+ const nextHole = () => {
   setTimeout(() => {
     saveRound();
 
-    if (hole < holeCount) {
-      const h = hole + 1;
-      setHole(h);
-      navigate(`/game?hole=${h}`);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
+    const startHole = Number(
+      localStorage.getItem("startHole") || 1
+    );
+
+    const playedCount =
+      JSON.parse(localStorage.getItem("rounds") || "[]").length;
+
+    if (playedCount >= 18) {
       navigate("/result");
+      return;
     }
+
+    let next = hole + 1;
+
+    if (next > 18) {
+      next = 1;
+    }
+
+    setHole(next);
+    navigate(`/game?hole=${next}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, 300);
 };
 

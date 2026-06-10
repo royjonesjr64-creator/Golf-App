@@ -45,6 +45,9 @@ const [selectedCourse, setSelectedCourse] = useState("");
 const [tee, setTee] = useState(
   localStorage.getItem("tee") || ""
 );
+const [startHole, setStartHole] = useState(
+  Number(localStorage.getItem("startHole") || 1)
+);
   const updatePlayer = (index, value) => {
     const next = [...players];
     next[index] = value;
@@ -90,6 +93,7 @@ if (selectedCourseData && Array.isArray(selectedCourseData.holes)) {  localStora
 
     localStorage.setItem("playDate", playDate);
 localStorage.setItem("tee", tee);
+localStorage.setItem("startHole", String(startHole));
     localStorage.removeItem("rounds");
 
     nav("/par-settings");
@@ -273,6 +277,23 @@ localStorage.setItem("tee", tee);
     <option value="青">青ティー</option>
     <option value="黒">黒ティー</option>
     <option value="レディース">レディース</option>
+  </select>
+</div>
+<div style={{ marginTop: 16 }}>
+  <div style={{ fontWeight: 800, color: "#334155", marginBottom: 8 }}>
+    スタートホール
+  </div>
+
+  <select
+    value={startHole}
+    onChange={(e) => setStartHole(Number(e.target.value))}
+    style={inputStyle}
+  >
+    {[...Array(18)].map((_, i) => (
+      <option key={i + 1} value={i + 1}>
+        {i + 1}番ホール
+      </option>
+    ))}
   </select>
 </div>
           </div>

@@ -70,7 +70,8 @@ useEffect(() => {
     const normalized = pars.map((v) => Number(v) || 4);
     localStorage.setItem("pars", JSON.stringify(normalized));
     localStorage.setItem("holeCount", JSON.stringify(holeCount));
-    nav("/game");
+    const startHole = Number(localStorage.getItem("startHole") || 1);
+nav(`/game?hole=${startHole}`);
   };
 
    return (
