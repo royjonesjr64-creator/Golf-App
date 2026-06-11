@@ -175,12 +175,15 @@ const [currency, setCurrency] = useState("円");
                     updatePlayer(index, "name", e.target.value)
                   }
                   placeholder={`プレイヤー${index + 1}`}
-                  style={{
-                    padding: 12,
-                    borderRadius: 12,
-                    border: "1px solid #cbd5e1",
-                    fontSize: 14,
-                  }}
+                 style={{
+  width: "100%",
+  maxWidth: "100%",
+  boxSizing: "border-box",
+  padding: 12,
+  borderRadius: 12,
+  border: "1px solid #cbd5e1",
+  fontSize: 14,
+}}
                 />
 
                 <input
@@ -190,14 +193,17 @@ const [currency, setCurrency] = useState("円");
                     updatePlayer(index, "point", e.target.value)
                   }
                   placeholder="pt"
-                  style={{
-                    padding: 12,
-                    borderRadius: 12,
-                    border: "1px solid #cbd5e1",
-                    fontSize: 16,
-                    fontWeight: 800,
-                    textAlign: "center",
-                  }}
+                 style={{
+  width: "100%",
+  maxWidth: "100%",
+  boxSizing: "border-box",
+  padding: 12,
+  borderRadius: 12,
+  border: "1px solid #cbd5e1",
+  fontSize: 16,
+  fontWeight: 800,
+  textAlign: "center",
+}}
                 />
 
                 <button
