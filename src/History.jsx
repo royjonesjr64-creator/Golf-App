@@ -1033,13 +1033,26 @@ overflowX: "auto",
             value={(totalInside100 / Math.max(totalHoles, 1)).toFixed(1)}
           />
 
-          <InfoChip
-            label="パット平均"
-            value={Math.round(
-              history.reduce((sum, h) => sum + (h.totalPutt || 0), 0) /
-                history.length
-            )}
-          />
+         <InfoChip
+  label="パット平均"
+  value={Math.round(
+    history.reduce((sum, h) => {
+      return (
+        sum +
+        (h.rounds || []).reduce((roundSum, r) => {
+          return (
+            roundSum +
+            (r.players || []).reduce(
+              (playerSum, p) =>
+                playerSum + Number(p.putt || 0),
+              0
+            )
+          );
+        }, 0)
+      );
+    }, 0) / Math.max(history.length, 1)
+  )}
+/>
 
           <InfoChip
             label="FWキープ率"
