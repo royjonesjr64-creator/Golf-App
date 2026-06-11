@@ -85,7 +85,15 @@ export default function Top() {
           <button style={primaryButton} onClick={() => navigate("/setup")}>
             ラウンド開始
           </button>
-
+<button
+  style={{
+    ...primaryButton,
+    background: "#f59e0b",
+  }}
+  onClick={() => navigate("/olympic-only")}
+>
+  🏆 オリンピック計算
+</button>
           <button style={secondaryButton} onClick={() => navigate("/history")}>
             履歴を見る
           </button>
