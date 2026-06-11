@@ -164,7 +164,7 @@ const [currency, setCurrency] = useState("円");
                 key={index}
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "1fr 70px 55px",
+                  gridTemplateColumns: "1fr",
                   gap: 8,
                   alignItems: "center",
                 }}
@@ -223,7 +223,8 @@ const [currency, setCurrency] = useState("円");
             onClick={addPlayer}
             style={{
               marginTop: 12,
-              width: "100%",
+              boxSizing: "border-box",
+width: "100%",
               padding: 14,
               borderRadius: 12,
               border: "none",
