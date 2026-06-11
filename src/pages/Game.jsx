@@ -50,6 +50,7 @@ const courses =
 
   const [hole, setHole] = useState(getInitialHole());
   const [rows, setRows] = useState([]);
+const [showEventHelp, setShowEventHelp] = useState(false);
   const [activePlayerIndex, setActivePlayerIndex] = useState(0);
 
   const [clubModalPlayer, setClubModalPlayer] = useState(null);
@@ -1503,6 +1504,88 @@ opacity: activePlayerIndex !== 0 ? 0.5 : 1,
               }}
             >
               <h2 style={{ margin: 0, fontSize: 20 }}>役を選択</h2>
+<div
+  style={{
+    display: "flex",
+    justifyContent: "flex-end",
+    marginBottom: 10,
+  }}
+>
+ <button
+  type="button"
+  onClick={() => setShowEventHelp(true)}
+>
+  ❓役説明
+</button>
+
+</div>
+{showEventHelp && (
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(15,23,42,0.45)",
+      zIndex: 9999,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 16,
+    }}
+  >
+    <div
+      style={{
+        background: "#fff",
+        borderRadius: 18,
+        padding: 16,
+        width: "100%",
+        maxWidth: 520,
+        maxHeight: "75vh",
+        overflowY: "auto",
+      }}
+    >
+      <h2 style={{ marginTop: 0 }}>❓ 役説明</h2>
+
+      <div style={{ display: "grid", gap: 10 }}>
+        {activeEvents.map((e) => (
+          <div
+            key={e.key || e.label}
+            style={{
+              padding: 12,
+              border: "1px solid #e5e7eb",
+              borderRadius: 12,
+              background: "#f8fafc",
+            }}
+          >
+            <div style={{ fontWeight: 900 }}>
+              {e.label}：{e.point > 0 ? `+${e.point}` : e.point}
+            </div>
+
+            <div style={{ marginTop: 6, color: "#475569", fontSize: 14 }}>
+              {e.description || "説明なし"}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <button
+        type="button"
+        onClick={() => setShowEventHelp(false)}
+        style={{
+          marginTop: 16,
+          width: "100%",
+          padding: 12,
+          borderRadius: 12,
+          border: "none",
+          background: "#2563eb",
+          color: "#fff",
+          fontWeight: 800,
+        }}
+      >
+        閉じる
+      </button>
+    </div>
+  </div>
+)}
               <button
                 onClick={() => setEventModalPlayer(null)}
                 style={closeButtonStyle}

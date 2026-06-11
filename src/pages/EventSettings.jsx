@@ -18,6 +18,7 @@ export default function EventSettings() {
   const [events, setEvents] = useState(defaultEvents);
   const [newLabel, setNewLabel] = useState("");
   const [newPoint, setNewPoint] = useState("");
+const [newDescription, setNewDescription] = useState("");
 
   useEffect(() => {
   const loadEvents = async () => {
@@ -84,15 +85,18 @@ export default function EventSettings() {
 
   const addEvent = () => {
     if (!newLabel.trim()) return;
-    const item = {
-      key: `custom_${Date.now()}`,
-      label: newLabel.trim(),
-      point: Number(newPoint) || 0,
-      active: true
-    };
+   const item = {
+  key: `custom_${Date.now()}`,
+  label: newLabel.trim(),
+  point: Number(newPoint) || 0,
+  description: newDescription.trim(),
+  active: true
+};
     setEvents([...events, item]);
     setNewLabel("");
-    setNewPoint("");
+setNewPoint("");
+setNewDescription("");
+
   };
 
   const updateEvent = (index, field, value) => {
@@ -140,7 +144,7 @@ export default function EventSettings() {
             key={event.key}
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 70px 70px 60px",
+              gridTemplateColumns: "1fr 1fr 70px 70px 60px",
               gap: 8,
               alignItems: "center",
               background: "#ffffff",
@@ -154,7 +158,14 @@ export default function EventSettings() {
               onChange={(e) => updateEvent(index, "label", e.target.value)}
               style={inputStyle}
             />
-
+<input
+  value={event.description || ""}
+  onChange={(e) =>
+    updateEvent(index, "description", e.target.value)
+  }
+  placeholder="説明"
+  style={inputStyle}
+/>
             <input
               type="number"
               value={event.point}
@@ -217,7 +228,15 @@ export default function EventSettings() {
           style={inputStyle}
         />
       </div>
-
+<input
+  value={newDescription}
+  onChange={(e) => setNewDescription(e.target.value)}
+  placeholder="役の説明"
+  style={{
+    ...inputStyle,
+    marginBottom: 10,
+  }}
+/>
       <button
         onClick={addEvent}
         style={{
