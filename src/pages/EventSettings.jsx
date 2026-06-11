@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { db } from "../firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 const defaultEvents = [
   { key: "sao", label: "竿", point: 3, active: true },
   { key: "sand_zero", label: "砂ゼロ", point: 8, active: true },
@@ -19,27 +20,67 @@ export default function EventSettings() {
   const [newPoint, setNewPoint] = useState("");
 
   useEffect(() => {
-    const saved = localStorage.getItem("olympicEvents");
-    if (saved) {
-      try {
-        setEvents(JSON.parse(saved));
-      } catch {
+  const loadEvents = async () => {
+    try {
+      const ref = doc(db, "settings", "olympicEvents");
+      const snap = await getDoc(ref);
+
+      if (snap.exists()) {
+        const data = snap.data();
+        const savedEvents = data.events || defaultEvents;
+        setEvents(savedEvents);
+        localStorage.setItem("olympicEvents", JSON.stringify(savedEvents));
+      } else {
         setEvents(defaultEvents);
       }
-    }
-  }, []);
+    } catch (error) {
+      console.error("役設定読み込みエラー:", error);
 
-  const saveEvents = () => {
+      const saved = localStorage.getItem("olympicEvents");
+      if (saved) {
+        setEvents(JSON.parse(saved));
+      }
+    }
+  };
+
+  loadEvents();
+}, []);
+
+  const saveEvents = async () => {
+  try {
+    const ref = doc(db, "settings", "olympicEvents");
+
+    await setDoc(ref, {
+      events,
+      updatedAt: new Date().toISOString(),
+    });
+
     localStorage.setItem("olympicEvents", JSON.stringify(events));
     alert("保存しました");
     navigate("/");
-  };
+  } catch (error) {
+    console.error("役設定保存エラー:", error);
+    alert("保存に失敗しました");
+  }
+};
 
-  const resetEvents = () => {
+  const resetEvents = async () => {
+  try {
+    const ref = doc(db, "settings", "olympicEvents");
+
+    await setDoc(ref, {
+      events: defaultEvents,
+      updatedAt: new Date().toISOString(),
+    });
+
     localStorage.setItem("olympicEvents", JSON.stringify(defaultEvents));
     setEvents(defaultEvents);
     alert("初期値に戻しました");
-  };
+  } catch (error) {
+    console.error("初期化エラー:", error);
+    alert("初期化に失敗しました");
+  }
+};
 
   const addEvent = () => {
     if (!newLabel.trim()) return;
