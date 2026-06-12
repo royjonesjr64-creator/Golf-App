@@ -126,14 +126,13 @@ setNewDescription("");
   };
 
   const inputStyle = {
-    width: "100%",
-    boxSizing: "border-box",
-    padding: "10px 12px",
-    borderRadius: 10,
-    border: "1px solid #cbd5e1",
-    fontSize: 15
-  };
-
+  width: "100%",
+  boxSizing: "border-box",
+  padding: "14px",
+  borderRadius: 12,
+  border: "1px solid #cbd5e1",
+  fontSize: 18,
+};
   return (
     <div style={pageStyle}>
       <h1>役設定</h1>
@@ -209,7 +208,7 @@ setNewDescription("");
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 90px",
+          gridTemplateColumns: "1fr",
           gap: 8,
           marginBottom: 10
         }}
