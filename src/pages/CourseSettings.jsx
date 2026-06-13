@@ -346,7 +346,7 @@ if (exists) {
           ))}
       </div>
 
-      <button
+            <button
         onClick={() => nav("/")}
         style={{
           marginTop: 16,
@@ -363,3 +363,13 @@ if (exists) {
     </div>
   </div>
 );
+}
+
+const holeInputStyle = {
+  width: "100%",
+  boxSizing: "border-box",
+  padding: 12,
+  borderRadius: 10,
+  border: "1px solid #cbd5e1",
+  fontSize: 15,
+};
