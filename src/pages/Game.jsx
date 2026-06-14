@@ -51,7 +51,8 @@ const courses =
   const [hole, setHole] = useState(getInitialHole());
   const [rows, setRows] = useState([]);
 const [showEventHelp, setShowEventHelp] = useState(false);
-  const [activePlayerIndex, setActivePlayerIndex] = useState(0);
+  const [showOlympicHistory, setShowOlympicHistory] = useState(false);
+const [activePlayerIndex, setActivePlayerIndex] = useState(0);
 
   const [clubModalPlayer, setClubModalPlayer] = useState(null);
   const [inside100ModalPlayer, setInside100ModalPlayer] = useState(null);
@@ -254,7 +255,7 @@ eventChecks: holeData.players[idx]?.eventChecks || {}
     background: active ? "#eff6ff" : "#ffffff",
     fontWeight: 700,
     cursor: "pointer",
-    fontSize: 14,
+    fontSize: 18,
     width: "100%",
     textAlign: "left"
   });
@@ -297,7 +298,96 @@ eventChecks: holeData.players[idx]?.eventChecks || {}
   };
 
   const currentRow = rows[activePlayerIndex] || emptyRow;
+const liveEventRanking = useMemo(() => {
+  const allRounds = [
+    ...getSavedRounds().filter((r) => Number(r?.hole) !== hole),
+    {
+      hole,
+      players: rows.map((row, index) => ({
+        playerName: playerNames[index],
+        eventChecks: row.eventChecks || {},
+      })),
+    },
+  ];
 
+  return playerNames.map((name, playerIndex) => {
+    let totalEventPoint = 0;
+    const eventCounts = {};
+
+    allRounds.forEach((round) => {
+      const player = round.players?.[playerIndex];
+
+      if (!player?.eventChecks) return;
+
+      Object.entries(player.eventChecks).forEach(([key, checked]) => {
+        if (!checked) return;
+
+        const event = activeEvents.find(
+          (e) => (e.key || e.label) === key
+        );
+
+        if (!event) return;
+
+        totalEventPoint += Number(event.point || 0);
+
+        eventCounts[event.label] =
+          (eventCounts[event.label] || 0) + 1;
+      });
+    });
+
+    return {
+      playerName: name,
+      totalEventPoint,
+      eventCounts,
+    };
+  });
+}, [rows, hole, playerNames, activeEvents]);
+const kanCheckList = useMemo(() => {
+  const targetEvents = [
+    { key: "gold", label: "金", point: 4 },
+    { key: "silver", label: "銀", point: 3 },
+    { key: "bronze", label: "銅", point: 2 },
+    { key: "iron", label: "鉄", point: 1 },
+  ];
+
+  const allRounds = [
+    ...getSavedRounds().filter((r) => Number(r?.hole) !== hole),
+    {
+      hole,
+      players: rows.map((row, index) => ({
+        playerName: playerNames[index],
+        eventChecks: row.eventChecks || {},
+      })),
+    },
+  ];
+
+  return playerNames.map((name, playerIndex) => {
+    const counts = targetEvents.map((event) => {
+      let count = 0;
+
+      allRounds.forEach((round) => {
+        const player = round.players?.[playerIndex];
+        const checks = player?.eventChecks || {};
+
+        if (checks[event.key]) {
+          count += 1;
+        }
+      });
+
+      return {
+        ...event,
+        count,
+        remaining: Math.max(0, 4 - count),
+        kanPoint: count >= 4 ? event.point * 4 : 0,
+      };
+    });
+
+    return {
+      playerName: name,
+      counts,
+    };
+  });
+}, [rows, hole, playerNames]);
   const totalScoreInfo = useMemo(() => {
     const rounds = getSavedRounds().filter((r) => Number(r?.hole) !== hole);
 
@@ -365,44 +455,53 @@ eventChecks: row.eventChecks || {},
 
     localStorage.setItem("rounds", JSON.stringify(updated));
   };
+const startHole = Number(
+  localStorage.getItem("startHole") || 1
+);
 
+const holeOrder = [
+  ...Array.from(
+    { length: 18 - startHole + 1 },
+    (_, i) => startHole + i
+  ),
+  ...Array.from(
+    { length: startHole - 1 },
+    (_, i) => i + 1
+  ),
+];
  const nextHole = () => {
-  setTimeout(() => {
-    saveRound();
+  saveRound();
 
-    const startHole = Number(
-      localStorage.getItem("startHole") || 1
-    );
+  const currentIndex = holeOrder.indexOf(hole);
 
-    const playedCount =
-      JSON.parse(localStorage.getItem("rounds") || "[]").length;
+  if (currentIndex >= holeOrder.length - 1) {
+    navigate("/result");
+    return;
+  }
 
-    if (playedCount >= 18) {
-      navigate("/result");
-      return;
-    }
+  const next = holeOrder[currentIndex + 1];
 
-    let next = hole + 1;
-
-    if (next > 18) {
-      next = 1;
-    }
-
-    setHole(next);
-    navigate(`/game?hole=${next}`);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, 300);
+  setHole(next);
+  navigate(`/game?hole=${next}`);
+  window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
   const prevHole = () => {
-    saveRound();
-    if (hole > 1) {
-      const h = hole - 1;
-      setHole(h);
-      navigate(`/game?hole=${h}`);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
+  saveRound();
+
+  const currentIndex = holeOrder.indexOf(hole);
+
+  if (currentIndex <= 0) return;
+
+  const prev = holeOrder[currentIndex - 1];
+
+  setHole(prev);
+  navigate(`/game?hole=${prev}`);
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+};
 
   const goNextPlayer = () => {
     if (activePlayerIndex < playerNames.length - 1) {
@@ -425,9 +524,7 @@ eventChecks: row.eventChecks || {},
       <div style={{ maxWidth: 900, margin: "0 auto" }}>
         <div
           style={{
-            position: "sticky",
-            top: 0,
-            zIndex: 20,
+          display: "none",
             background: "rgba(248,250,252,0.96)",
             backdropFilter: "blur(8px)",
             borderRadius: 20,
@@ -437,6 +534,7 @@ eventChecks: row.eventChecks || {},
         >
           <div
             style={{
+display: "none",
               background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
               color: "#ffffff",
               borderRadius: 22,
@@ -455,9 +553,29 @@ eventChecks: row.eventChecks || {},
                 flexWrap: "wrap"
               }}
             >
-              <div style={{ fontSize: 22, fontWeight: 900 }}>
-                H{hole} / {holeCount}
-              </div>
+              <div>
+  <div
+    style={{
+      fontSize: 13,
+      fontWeight: 800,
+      opacity: 0.9,
+      marginBottom: 2,
+    }}
+  >
+    現在ホール
+  </div>
+
+  <div
+    style={{
+      fontSize: 44,
+      fontWeight: 1000,
+      lineHeight: 1,
+      letterSpacing: "-1px",
+    }}
+  >
+    {hole}H
+  </div>
+</div>
               <div
                 style={{
                   padding: "6px 12px",
@@ -515,6 +633,46 @@ eventChecks: row.eventChecks || {},
               >
                 入力中：{playerNames[activePlayerIndex] || "-"}
               </div>
+<div
+  style={{
+    width: "100%",
+    marginTop: 8,
+    padding: 10,
+    borderRadius: 14,
+    background: "rgba(255,255,255,0.18)",
+  }}
+>
+  <div
+  style={{
+    fontSize: 18,
+    fontWeight: 900,
+    marginBottom: 10,
+  }}
+>
+  途中役ランキング
+</div>
+ {liveEventRanking
+    .slice()
+    .sort((a, b) => b.totalEventPoint - a.totalEventPoint)
+    .map((player, idx) => (
+      <div
+        key={player.playerName}
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 8,
+          fontSize: 16,
+fontWeight: 900,
+marginTop: 8,
+        }}
+      >
+        <span>
+          {idx + 1}. {player.playerName}
+        </span>
+        <span>{player.totalEventPoint}pt</span>
+      </div>
+    ))}
+</div>
             </div>
           </div>
         </div>
@@ -676,6 +834,55 @@ eventChecks: row.eventChecks || {},
                 padding: 12
               }}
             >
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "1fr auto",
+    gap: 10,
+    alignItems: "center",
+    marginBottom: 10,
+    padding: 12,
+    borderRadius: 16,
+    background: "#2563eb",
+    color: "#ffffff",
+  }}
+>
+  <div>
+    <div style={{ fontSize: 12, fontWeight: 800, opacity: 0.9 }}>
+      現在ホール
+    </div>
+    <div style={{ fontSize: 34, fontWeight: 1000, lineHeight: 1 }}>
+      {hole}H
+    </div>
+<button
+  type="button"
+  onClick={() => setShowOlympicHistory(true)}
+  style={{
+    marginTop: 8,
+    padding: "8px 10px",
+    borderRadius: 12,
+    border: "none",
+    background: "rgba(255,255,255,0.2)",
+    color: "#ffffff",
+    fontWeight: 900,
+    cursor: "pointer",
+  }}
+>
+  履歴を見る
+</button>
+  </div>
+
+  <div
+    style={{
+      padding: "8px 12px",
+      borderRadius: 999,
+      background: "rgba(255,255,255,0.2)",
+      fontWeight: 900,
+    }}
+  >
+    Par {currentPar}
+  </div>
+</div>
               <div
                 style={{
                   display: "flex",
@@ -980,7 +1187,7 @@ opacity: activePlayerIndex !== 0 ? 0.5 : 1,
   type="button"
   disabled={activePlayerIndex !== 0}
   onClick={() => setInside100ModalPlayer(activePlayerIndex)}
-                  onClick={() => setInside100ModalPlayer(activePlayerIndex)}
+                  
                   style={{
                     ...inputStyle,
                     padding: "12px 10px",
@@ -997,14 +1204,13 @@ opacity: activePlayerIndex !== 0 ? 0.5 : 1,
                 </button>
 <button
   type="button"
-  disabled={activePlayerIndex !== 0}
   onClick={() => setPuttModalPlayer(activePlayerIndex)}
                   style={{
   ...inputStyle,
   padding: "12px 10px",
   textAlign: "center",
   cursor: "pointer",
-  opacity: activePlayerIndex !== 0 ? 0.5 : 1,
+  
   fontSize: 14,
                     color: currentRow.putt !== "" ? "#0f172a" : "#64748b"
                   }}
@@ -1689,6 +1895,104 @@ opacity: activePlayerIndex !== 0 ? 0.5 : 1,
           </div>
         </div>
       )}
+{showOlympicHistory && (
+  <div
+    onClick={() => setShowOlympicHistory(false)}
+    style={modalBackdropStyle}
+  >
+    <div onClick={(e) => e.stopPropagation()} style={modalCardStyle}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 12,
+        }}
+      >
+        <h2 style={{ margin: 0 }}>履歴</h2>
+        <button
+          onClick={() => setShowOlympicHistory(false)}
+          style={closeButtonStyle}
+        >
+          閉じる
+        </button>
+      </div>
+
+      <div style={{ display: "grid", gap: 10 }}>
+        {liveEventRanking
+          .slice()
+          .sort((a, b) => b.totalEventPoint - a.totalEventPoint)
+          .map((player, idx) => (
+            <div
+              key={player.playerName}
+              style={{
+                padding: 12,
+                borderRadius: 14,
+                background: "#f8fafc",
+                border: "1px solid #e2e8f0",
+              }}
+            >
+              <div style={{ fontWeight: 900, fontSize: 16 }}>
+                {idx + 1}. {player.playerName}　{player.totalEventPoint}pt
+              </div>
+
+              <div style={{ marginTop: 6, color: "#475569", fontSize: 14 }}>
+                {Object.keys(player.eventCounts || {}).length === 0
+  ? "役なし"
+  : (() => {
+      const entries = Object.entries(player.eventCounts);
+
+      const totalCount = entries.reduce(
+        (sum, [, count]) => sum + Number(count || 0),
+        0
+      );
+
+      
+
+      return (
+        <>
+          {entries
+            .map(([label, count]) => `${label}×${count}`)
+            .join(" / ")}
+
+         {totalCount > 0 && (
+  <div
+    style={{
+      marginTop: 6,
+      color: totalCount % 4 === 0 ? "#16a34a" : "#2563eb",
+      fontWeight: 800,
+    }}
+  >
+
+    {(() => {
+      if (totalCount % 4 !== 0) {
+        return `あと${4 - (totalCount % 4)}で貫`;
+      }
+
+      const gold = Number(player.eventCounts?.金 || 0);
+      const silver = Number(player.eventCounts?.銀 || 0);
+      const bronze = Number(player.eventCounts?.銅 || 0);
+
+      const kanPoint =
+        Math.floor(gold / 4) * 32 +
+        Math.floor(silver / 4) * 16 +
+        Math.floor(bronze / 4) * 8;
+
+      return `✅ 貫達成 +${kanPoint}pt`;
+    })()}
+  </div>
+
+)}
+        </>
+      );
+    })()}
+              </div>
+            </div>
+          ))}
+      </div>
+    </div>
+  </div>
+)}
 {detailModal && (
   <div
     onClick={() => setDetailModal(null)}
@@ -1720,7 +2024,19 @@ opacity: activePlayerIndex !== 0 ? 0.5 : 1,
           type="button"
           onClick={() => {
             const current = rows[detailModal.player]?.[detailModal.key];
+const getKanPoint = (eventCounts = {}) => {
+  const gold = Number(eventCounts["金"] || 0);
+  const silver = Number(eventCounts["銀"] || 0);
+  const bronze = Number(eventCounts["銅"] || 0);
+  const iron = Number(eventCounts["鉄"] || 0);
 
+  return (
+    Math.floor(gold / 4) * 32 +
+    Math.floor(silver / 4) * 16 +
+    Math.floor(bronze / 4) * 8 +
+    Math.floor(iron / 4) * 4
+  );
+};
             updateRow(
               detailModal.player,
               detailModal.key,
