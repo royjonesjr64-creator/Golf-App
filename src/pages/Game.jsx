@@ -599,7 +599,7 @@ const isHoleSaved = (targetHole) => {
         padding: 12,
 paddingTop: "calc(48px + env(safe-area-inset-top))",
         boxSizing: "border-box",
-        paddingBottom: 330
+        paddingBottom: 20
 
       }}
     >
@@ -858,12 +858,9 @@ marginTop: 8,
       {playerNames.length > 0 && (
         <div
           style={{
-            position: "fixed",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 50,
-            background: "rgba(255,255,255,0.98)",
+            position: "static",
+marginTop: 12,
+background: "rgba(255,255,255,0.98)",
             backdropFilter: "blur(10px)",
             borderTop: "1px solid #dbe2ea",
             boxShadow: "0 -8px 24px rgba(15,23,42,0.08)"
