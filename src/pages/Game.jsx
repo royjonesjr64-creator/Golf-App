@@ -597,8 +597,10 @@ const isHoleSaved = (targetHole) => {
         minHeight: "100vh",
         background: "linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%)",
         padding: 12,
+paddingTop: "calc(48px + env(safe-area-inset-top))",
         boxSizing: "border-box",
         paddingBottom: 330
+
       }}
     >
       <div style={{ maxWidth: 900, margin: "0 auto" }}>
