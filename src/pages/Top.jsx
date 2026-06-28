@@ -27,17 +27,17 @@ export default function Top() {
     background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
     color: "#ffffff",
     borderRadius: 24,
-    padding: "18px 16px",
+    padding: "24px 16px",
     textAlign: "center",
     marginBottom: 22
   }}
 >
-  <div style={{ fontSize: 13, opacity: 0.9 }}>GOLF GAME CALCULATOR</div>
+  <div style={{ fontSize: 13, opacity: 0.9 }}>GOLF ROUND APP</div>
 
   <h1
     style={{
       margin: "10px 0",
-      fontSize: "clamp(24px, 8vw, 34px)",
+      fontSize: "clamp(20px, 8vw, 30px)",
       fontWeight: 800,
       textAlign: "center",
       lineHeight: 1.2,
@@ -45,7 +45,7 @@ export default function Top() {
       overflowWrap: "normal"
     }}
   >
-    ゴルフゲーム計算
+    ゴルフアプリ
   </h1>
 
   <div
@@ -56,34 +56,33 @@ export default function Top() {
       overflowWrap: "normal"
     }}
   >
-    オリンピック・ニアピン・役・貫・清算・共有に特化
+    スコア・パー・クラブ・パット・オリンピックを記録
   </div>
 </div>
-<div
-  style={{
-    background: "#f8fafc",
-    border: "1px solid #e2e8f0",
-    borderRadius: 16,
-    padding: 14,
-    marginBottom: 16,
-    fontWeight: 700,
-    lineHeight: 1.8,
-  }}
->
-  🏆 オリンピック / 🎯 ニアピン / 🚀 ドラコン / ⭐ 役 / 🔥 貫
-  <div style={{ fontSize: 13, color: "#64748b", fontWeight: 600 }}>
-    ポイント入力から清算・共有までまとめて管理
-  </div>
-</div>
-<div
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+            gap: 14,
+            marginBottom: 24
+          }}
+        >
+          <Card title="入力" text="ホールごとにスコアやクラブを記録" />
+          <Card title="分析" text="結果画面でまとめて確認" />
+          <Card title="編集" text="履歴からラウンドを再編集" />
+          <Card title="カスタム" text="役やクラブを自分用に変更" />
+        </div>
+
+        <div
   style={{
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
     gap: 12,
   }}
 >
-          <button style={primaryButton} onClick={() => navigate("/game-calculator")}>
-            ゲーム開始
+          <button style={primaryButton} onClick={() => navigate("/setup")}>
+            ラウンド開始
           </button>
 <button
   style={{
@@ -95,21 +94,21 @@ export default function Top() {
   🏆 オリンピック計算
 </button>
           <button style={secondaryButton} onClick={() => navigate("/history")}>
-            ゲーム履歴
+            履歴を見る
           </button>
 
           <button
             style={secondaryButton}
             onClick={() => navigate("/event-settings")}
           >
-            役設定
+            役をカスタム
           </button>
 
           <button
             style={secondaryButton}
             onClick={() => navigate("/club-settings")}
           >
-            ポイント設定
+            クラブをカスタム
           </button>
         </div>
       </div>
